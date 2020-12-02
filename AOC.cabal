@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e41aafdc69c1b02e648bc75afa26464084a8a50a9b542d6aee7f45fa8f59e020
+-- hash: 59b43e5ad0af1d0b4046fd8e8a1216ab3bde7718b5cae9c5dc57fe5ffd2d1747
 
 name:           AOC
 version:        1.0
@@ -19,6 +19,7 @@ executable AOC
   main-is: Main.hs
   other-modules:
       AOC1
+      AOC2
   ghc-options: -ddump-to-file -ddump-hi -threaded -rtsopts -with-rtsopts=-N -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
   build-depends:
       ansi-terminal

@@ -3,6 +3,7 @@ module Main where
 import           System.Environment
 import           System.Exit
 import qualified AOC1 as AOC1
+import qualified AOC2 as AOC2
 
 safeHead :: [a] -> Maybe a
 safeHead []      = Nothing
@@ -23,4 +24,5 @@ main = do
   case safeHead arg of
     Nothing    -> putStrLn "Usage: AOC <day>" >>= const exitFailure
     Just "1"   -> format AOC1.solution1 AOC1.solution2
+    Just "2"   -> format AOC2.solution1 AOC2.solution2
     Just other -> putStrLn $ "No sulution for day " ++ show other
