@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 59b43e5ad0af1d0b4046fd8e8a1216ab3bde7718b5cae9c5dc57fe5ffd2d1747
+-- hash: 32ef568c73fdf470bb6ea25d63f23a4d557c19c9be50e7281a970df9c8ee6889
 
 name:           AOC
 version:        1.0
@@ -20,6 +20,7 @@ executable AOC
   other-modules:
       AOC1
       AOC2
+      AOC3
   ghc-options: -ddump-to-file -ddump-hi -threaded -rtsopts -with-rtsopts=-N -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -O2
   build-depends:
       ansi-terminal
