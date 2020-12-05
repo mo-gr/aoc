@@ -26,7 +26,7 @@ mulExpenses _            = Nothing
 
 mulExpenses3 :: Maybe (Integer, Integer, Integer) -> Maybe Integer
 mulExpenses3 (Just (x, y, z)) = Just (x * y * z)
-mulExpenses3 _                 = Nothing
+mulExpenses3 _                = Nothing
 
 allPairs :: [a] -> [(a, a)]
 allPairs ls @ (_ : xs) = [(x, pair) | x <- ls, pair <- xs]

@@ -2,9 +2,10 @@
 
 module AOC2 where
 
-import           Text.Parsec            (digit, many1, skipMany, space, string, letter)
+import           Data.Either            (fromRight)
+import           Text.Parsec            (digit, letter, many1, skipMany, space,
+                                         string)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
-import Data.Either (fromRight)
 
 data Policy = Policy { character::Char, minCount::Int, maxCount::Int } deriving (Show)
 
@@ -32,7 +33,7 @@ lineParser = do
   password <- passwordParser
   skipMany space
   return (policy, password)
-  
+
 inputParser :: Parser [(Policy, Password)]
 inputParser = many1 lineParser
 
@@ -42,10 +43,10 @@ exampleInput = [
   (Policy {character = 'b', minCount = 1, maxCount = 3},"cdefg"),
   (Policy {character = 'c', minCount = 2, maxCount = 9},"ccccccccc")
   ]
-  
+
 evalPolicy :: (Policy, String) -> Bool
 evalPolicy (Policy{..}, password) = let occurances = length $ filter (== character) password in
-  occurances >= minCount && occurances <= maxCount 
+  occurances >= minCount && occurances <= maxCount
 
 dec :: Int -> Int
 dec n = n -1
@@ -53,13 +54,13 @@ dec n = n -1
 evalPolicyToboggan :: (Policy, String) -> Bool
 evalPolicyToboggan (Policy{..}, password) = let first = password !! dec minCount
                                                 second = password !! dec maxCount in
-  (first == character && second /= character) || (first /= character && second == character) 
+  (first == character && second /= character) || (first /= character && second == character)
 
--- 625 
+-- 625
 solution1 :: IO Int
 solution1 = do
   policies <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
-  return $ length $ filter evalPolicy policies  
+  return $ length $ filter evalPolicy policies
 
 -- 391
 solution2 :: IO Int

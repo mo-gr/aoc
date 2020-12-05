@@ -1,11 +1,12 @@
 module Main where
 
+import qualified AOC1
+import qualified AOC2
+import qualified AOC3
+import qualified AOC4
+import qualified AOC5
 import           System.Environment
 import           System.Exit
-import qualified AOC1 as AOC1
-import qualified AOC2 as AOC2
-import qualified AOC3 as AOC3
-import qualified AOC4 as AOC4
 
 safeHead :: [a] -> Maybe a
 safeHead []      = Nothing
@@ -29,4 +30,5 @@ main = do
     Just "2"   -> format AOC2.solution1 AOC2.solution2
     Just "3"   -> format AOC3.solution1 AOC3.solution2
     Just "4"   -> format AOC4.solution1 AOC4.solution2
+    Just "5"   -> format AOC5.solution1 AOC5.solution2
     Just other -> putStrLn $ "No sulution for day " ++ show other

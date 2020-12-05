@@ -30,6 +30,7 @@ executables:
       - AOC2
       - AOC3
       - AOC4
+      - AOC5
 data-files:
 - example.txt
 stability: experimental

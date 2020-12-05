@@ -2,9 +2,9 @@ module AOC4 where
 
 import           Data.Either            (fromRight)
 import qualified Data.Set               as S
-import           Text.Parsec            (alphaNum, char, count,
-                                         endOfLine, letter, many1, sepBy1,
-                                         space, string, (<|>))
+import           Text.Parsec            (alphaNum, char, count, endOfLine,
+                                         letter, many1, sepBy1, space, string,
+                                         (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
 
 fieldParser :: Parser (String, String)
