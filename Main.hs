@@ -7,8 +7,10 @@ import qualified AOC4
 import qualified AOC5
 import qualified AOC6
 import qualified AOC7
+import qualified AOC8
 import           System.Environment
 import           System.Exit
+import           Data.Maybe (fromMaybe)
 
 safeHead :: [a] -> Maybe a
 safeHead []      = Nothing
@@ -23,9 +25,9 @@ format s1 s2 = do
 
 main :: IO ()
 main = do
-  print "Advent of Code 2020"
-  print "https://adventofcode.com/2020"
   arg <- getArgs
+  putStrLn $ "Advent of Code 2020 - Day " ++ (fromMaybe "" (safeHead arg))
+  putStrLn "https://adventofcode.com/2020"
   case safeHead arg of
     Nothing    -> putStrLn "Usage: AOC <day>" >>= const exitFailure
     Just "1"   -> format AOC1.solution1 AOC1.solution2
@@ -35,4 +37,5 @@ main = do
     Just "5"   -> format AOC5.solution1 AOC5.solution2
     Just "6"   -> format AOC6.solution1 AOC6.solution2
     Just "7"   -> format AOC7.solution1 AOC7.solution2
+    Just "8"   -> format AOC8.solution1 AOC8.solution2
     Just other -> putStrLn $ "No sulution for day " ++ show other
