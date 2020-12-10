@@ -36,17 +36,20 @@ dropTil :: Jolts -> [Jolts] -> [Jolts]
 dropTil c (x:xs) | x < c = dropTil c xs
 dropTil _c xs = xs
 
-tired :: [Int] -> Int -> Int
-tired [] _ = 1
-tired (0:_x) _ = 1
-tired (x:_x) 1 = x
-tired (x:y:_x) 2 = x + y
-tired (x:y:z:_x) 3 = x + y + z
-tired _ _ = error "go to bed"
+sumPreviousTouches :: [Int] -> Int -> Int
+sumPreviousTouches [] _count = 1
+sumPreviousTouches (x:_x) 1 = x
+sumPreviousTouches (x:y:_x) 2 = x + y
+sumPreviousTouches (x:y:z:_x) 3 = x + y + z
+sumPreviousTouches _touches _count = error "something went wrong: more than three previous jolts"
 
 countValidConfigurations :: [Jolts] -> Int
-countValidConfigurations jj = let touches = [] in
-  last . reverse $ foldl (\t i -> (: t) $ tired t (length . take 3 . filter (`isCompatible` (jj !! i)) $ take i jj)) touches [0..(length jj - 1)]
+countValidConfigurations jj = let
+  indexes = [0..(length jj - 1)]
+  countPreviousCompatible i = length . take 3 . filter (`isCompatible` (jj !! i)) $ take i jj
+  addPreviousTouches touches i = sumPreviousTouches touches (countPreviousCompatible i) : touches 
+  in
+    last . reverse $ foldl addPreviousTouches [] indexes
 
 -- 2450
 solution1 :: IO Int
