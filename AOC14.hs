@@ -40,7 +40,7 @@ commandParser = maskParser <|> writeParser
 inputParser :: Parser [Command]
 inputParser = many1 commandParser
 
-data Mask = Mask {setBits :: [Int], unsetBits :: [Int], floatBits :: [Int]}
+data Mask = Mask {setBits :: [BitIndex], unsetBits :: [BitIndex], floatBits :: [BitIndex]}
    deriving (Show)
 
 data Memory = Memory { values :: M.Map Address Value, mask :: Mask}
@@ -51,10 +51,7 @@ mkMemory = Memory M.empty (Mask [] [] [])
 
 type Value =  Int
 type Address = Int
-
-tick :: Memory -> Command -> Memory
-tick m UpdateMask {newMask} = m {mask=newMask}
-tick m Write {location, value} = m {values=M.insert location (applyMask (mask m) value) (values m)}
+type BitIndex = Int
 
 applyMask :: Mask -> Value -> Value
 applyMask Mask {setBits, unsetBits} i = foldl clearBit (foldl setBit i setBits) unsetBits
@@ -62,12 +59,15 @@ applyMask Mask {setBits, unsetBits} i = foldl clearBit (foldl setBit i setBits) 
 applyMaskV2 :: Mask -> Address -> [Address]
 applyMaskV2 Mask {setBits, floatBits} addr =
   let addr' = foldl setBit addr setBits
-      go :: Address -> [Int] -> [Address]
+      go :: Address -> [BitIndex] -> [Address]
       go v []     = [v]
       go v (b:bs) = concat $ flip go bs <$> [setBit v b, clearBit v b]
   in
   go addr' floatBits
 
+tick :: Memory -> Command -> Memory
+tick m UpdateMask {newMask} = m {mask=newMask}
+tick m Write {location, value} = m {values=M.insert location (applyMask (mask m) value) (values m)}
 
 tickV2 ::Memory -> Command -> Memory
 tickV2 m UpdateMask {newMask} = m {mask=newMask}
