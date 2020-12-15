@@ -4,7 +4,6 @@ module AOC12 where
 
 import           Data.Either            (fromRight)
 import           Text.Parsec            (digit, endOfLine, many1, oneOf)
-import           Text.Parsec            (many1)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
 
 type Coord = (Int,Int)
