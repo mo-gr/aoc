@@ -41,6 +41,7 @@ executables:
       - AOC13
       - AOC14
       - AOC15
+      - AOC16
 data-files:
 - example.txt
 stability: experimental
