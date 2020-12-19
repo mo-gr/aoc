@@ -44,6 +44,7 @@ executables:
       - AOC16
       - AOC17
       - AOC18
+      - AOC19
 data-files:
-- example.txt
+- example.input
 stability: experimental
