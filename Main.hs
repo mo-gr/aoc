@@ -20,6 +20,7 @@ import qualified AOC17
 import qualified AOC18
 import qualified AOC19
 import qualified AOC20
+import qualified AOC21
 import           System.Environment
 import           System.Exit
 import           Data.Maybe (fromMaybe)
@@ -62,4 +63,5 @@ main = do
     Just "18"   -> format AOC18.solution1 AOC18.solution2
     Just "19"   -> format AOC19.solution1 AOC19.solution2
     Just "20"   -> format AOC20.solution1 AOC20.solution2
+    Just "21"   -> format AOC21.solution1 AOC21.solution2
     Just other -> putStrLn $ "No sulution for day " ++ show other
