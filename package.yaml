@@ -48,6 +48,9 @@ executables:
       - AOC20
       - AOC21
       - AOC22
+      - AOC23
+      - AOC24
+      - AOC25
 data-files:
 - example.input
 stability: experimental
