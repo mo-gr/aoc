@@ -26,8 +26,10 @@ import qualified AOC23
 import qualified AOC24
 import qualified AOC25
 import           System.Environment
+import           System.Directory
 import           System.Exit
 import           Data.Maybe (fromMaybe)
+import           Paths_AOC
 
 safeHead :: [a] -> Maybe a
 safeHead []      = Nothing
@@ -45,6 +47,8 @@ main = do
   arg <- getArgs
   putStrLn $ "Advent of Code 2020 - Day " ++ (fromMaybe "" (safeHead arg))
   putStrLn "https://adventofcode.com/2020"
+  dataDir <- getDataDir
+  setCurrentDirectory $ dataDir ++ "/2020"
   case safeHead arg of
     Nothing    -> putStrLn "Usage: AOC <day>" >>= const exitFailure
     Just "1"   -> format AOC1.solution1 AOC1.solution2

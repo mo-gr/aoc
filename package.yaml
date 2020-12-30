@@ -10,6 +10,7 @@ dependencies:
 - hedgehog
 - bytestring
 - ansi-terminal
+- directory
 executables:
   AOC:
     main: Main.hs
@@ -25,32 +26,10 @@ executables:
       - -Wincomplete-uni-patterns
       - -Wredundant-constraints
       - -O2
-    other-modules:
-      - AOC1
-      - AOC2
-      - AOC3
-      - AOC4
-      - AOC5
-      - AOC6
-      - AOC7
-      - AOC8
-      - AOC9
-      - AOC10
-      - AOC11
-      - AOC12
-      - AOC13
-      - AOC14
-      - AOC15
-      - AOC16
-      - AOC17
-      - AOC18
-      - AOC19
-      - AOC20
-      - AOC21
-      - AOC22
-      - AOC23
-      - AOC24
-      - AOC25
+    source-dirs:
+      - src
+      - src/2020
+data-dir: data
 data-files:
-- example.input
+  - '2020/*.input'
 stability: experimental
