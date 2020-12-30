@@ -1,4 +1,4 @@
-module AOC17 where
+module Y2020.AOC17 where
 
 import           Data.Maybe (catMaybes)
 import qualified Data.Set   as S

@@ -1,4 +1,4 @@
-module AOC15 where
+module Y2020.AOC15 where
 
 import           Data.List       (elemIndex, unfoldr)
 import qualified Data.Map.Strict as M

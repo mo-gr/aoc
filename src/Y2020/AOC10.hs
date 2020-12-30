@@ -1,4 +1,4 @@
-module AOC10 where
+module Y2020.AOC10 where
 
 import Text.Parsec ( endOfLine, digit, many1 )
 

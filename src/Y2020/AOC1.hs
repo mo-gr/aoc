@@ -1,4 +1,4 @@
-module AOC1 where
+module Y2020.AOC1 where
 
 import           Text.Parsec            (digit, many1, skipMany, space)
 import           Text.Parsec.ByteString (Parser, parseFromFile)

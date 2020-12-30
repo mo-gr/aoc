@@ -1,4 +1,4 @@
-module AOC19 where
+module Y2020.AOC19 where
 
 import           Data.ByteString.Char8  (pack)
 import           Data.List              (nub)

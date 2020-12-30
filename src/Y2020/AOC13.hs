@@ -1,4 +1,4 @@
-module AOC13 where
+module Y2020.AOC13 where
 
 import           Data.List (iterate', minimumBy)
 

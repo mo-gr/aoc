@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module AOC8 where
+module Y2020.AOC8 where
 
 import           Data.Either            (fromRight)
 import           Text.Parsec            (char, count, digit, letter, many1,

@@ -1,4 +1,4 @@
-module AOC3 where
+module Y2020.AOC3 where
 
 import           Data.Either            (fromRight)
 import           Text.Parsec            (many1, skipMany, space, string, (<|>))

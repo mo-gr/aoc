@@ -1,4 +1,4 @@
-module AOC6 where
+module Y2020.AOC6 where
 
 import           Text.Parsec            (endOfLine, many1, oneOf, sepBy)
 import           Data.Either            (fromRight)

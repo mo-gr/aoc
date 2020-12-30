@@ -1,4 +1,4 @@
-module AOC25 where
+module Y2020.AOC25 where
 
 import           Data.List (foldl')
 

@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module AOC16 where
+module Y2020.AOC16 where
 
 import           Data.Either            (fromRight)
 import qualified Data.Map.Strict        as M

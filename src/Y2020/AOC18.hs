@@ -1,4 +1,4 @@
-module AOC18 where
+module Y2020.AOC18 where
 
 (+:) :: Int -> Int -> Int
 (+:) = (+)

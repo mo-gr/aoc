@@ -1,4 +1,4 @@
-module AOC11 where
+module Y2020.AOC11 where
 
 import           Data.Either            (fromRight)
 import           Data.Functor           (($>))

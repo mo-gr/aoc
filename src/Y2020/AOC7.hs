@@ -1,4 +1,4 @@
-module AOC7 where
+module Y2020.AOC7 where
 
 import Text.Parsec.ByteString (Parser, parseFromFile)
 import Text.Parsec (many1, letter, space, string, (<|>), digit, sepBy, optional)

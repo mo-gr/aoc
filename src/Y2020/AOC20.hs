@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module AOC20 where
+module Y2020.AOC20 where
 
 import           Data.Functor           ((<&>))
 import           Data.List              (find, nub, transpose)

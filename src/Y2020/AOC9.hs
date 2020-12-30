@@ -1,4 +1,4 @@
-module AOC9 where
+module Y2020.AOC9 where
 
 import           Data.Either            (fromRight)
 import           Text.Parsec            (digit, endOfLine, many1)

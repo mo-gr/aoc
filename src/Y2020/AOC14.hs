@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module AOC14 where
+module Y2020.AOC14 where
 
 import           Data.Bits              (clearBit, setBit)
 import           Data.Either            (fromRight)

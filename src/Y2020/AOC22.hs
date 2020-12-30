@@ -1,4 +1,4 @@
-module AOC22 where
+module Y2020.AOC22 where
 
 import qualified Data.Set as S
 

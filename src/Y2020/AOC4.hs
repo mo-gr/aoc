@@ -1,4 +1,4 @@
-module AOC4 where
+module Y2020.AOC4 where
 
 import           Data.Either            (fromRight)
 import qualified Data.Set               as S

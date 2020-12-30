@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module AOC2 where
+module Y2020.AOC2 where
 
 import           Data.Either            (fromRight)
 import           Text.Parsec            (digit, letter, many1, skipMany, space,

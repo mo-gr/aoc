@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module AOC23 where
+module Y2020.AOC23 where
 
 import           Data.List       (foldl', intercalate)
 import qualified Data.Map.Strict as M

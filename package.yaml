@@ -28,7 +28,6 @@ executables:
       - -O2
     source-dirs:
       - src
-      - src/2020
 data-dir: data
 data-files:
   - '2020/*.input'
