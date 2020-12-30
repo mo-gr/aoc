@@ -1,6 +1,6 @@
-# Advent of Code 2020
+# Advent of Code - Multi Year Repo
 
-Here are my solutions (and failed attempts) to many of the [Advent of Code 2020](https://adventofcode.com/2020/) tasks.
+Here are my solutions (and failed attempts) to most of the [Advent of Code](https://adventofcode.com/) tasks.
 
 I used this as an opportunity to get some more Haskell experience.
 
@@ -9,8 +9,10 @@ I actually used [Haskell for Mac](http://haskellformac.com) while developing mos
 To run these, just use [stack](https://docs.haskellstack.org/en/stable/README/).
 
 ```
-stack run AOC <number of task>
+stack run AOC <optional year> <number of task>
 ```
+
+If no year is provided, it uses the most recent year.
 
 The tool expects the input files (part of this repository) to be in the current working directory. Otherwise it will just fail hard.
 
