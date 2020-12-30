@@ -3,13 +3,11 @@ module Y2020.AOC19 where
 import           Data.ByteString.Char8  (pack)
 import           Data.List              (nub)
 import qualified Data.Map.Strict        as M
-import           Text.Parsec            (ParseError, char, choice, digit,
-                                         endOfLine, eof, many1, oneOf,
-                                         runParser, sepBy1, string, try, (<|>))
+import           Text.Parsec            (ParseError, char, choice, endOfLine,
+                                         eof, many1, oneOf, runParser, sepBy1,
+                                         string, try, (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
-
-number :: Parser Int
-number = read <$> many1 digit
+import           Util                   (number)
 
 leafParser :: Parser Rule
 leafParser = do

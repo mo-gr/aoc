@@ -1,20 +1,19 @@
 module Y2020.AOC7 where
 
 import Text.Parsec.ByteString (Parser, parseFromFile)
-import Text.Parsec (many1, letter, space, string, (<|>), digit, sepBy, optional)
+import Text.Parsec (many1, letter, space, string, (<|>), sepBy, optional)
 import Data.Either (fromRight)
 import qualified Data.Map.Strict as Map
 import Data.List (nub)
 import Data.Maybe (fromJust)
+import Util (number)
 
 type Color = String
+
 data BagType = BagType {
   color::Color,
   mayContain :: [Color]
 } deriving (Show)
-
-number :: Parser Int
-number = read <$> many1 digit
 
 colorParser :: Parser Color
 colorParser = do

@@ -3,9 +3,10 @@
 module Y2020.AOC8 where
 
 import           Data.Either            (fromRight)
-import           Text.Parsec            (char, count, digit, letter, many1,
-                                         space, (<|>))
+import           Text.Parsec            (char, count, letter, many1, space,
+                                         (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 data Instruction =
   NOP { arg:: Int }
@@ -17,9 +18,6 @@ data CPU = CPU {
   op          :: Int,
   code        :: [Instruction]
 } deriving (Show)
-
-number :: Parser Int
-number = read <$> many1 digit
 
 instructionParser :: Parser Instruction
 instructionParser = do

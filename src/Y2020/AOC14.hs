@@ -5,18 +5,16 @@ module Y2020.AOC14 where
 import           Data.Bits              (clearBit, setBit)
 import           Data.Either            (fromRight)
 import qualified Data.Map.Strict        as M
-import           Text.Parsec            (char, count, digit, endOfLine, many1,
-                                         string, try, (<|>))
+import           Text.Parsec            (char, count, endOfLine, many1, string,
+                                         try, (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 
 data Command =
   UpdateMask {newMask :: Mask}
   | Write {location :: Address, value :: Value}
   deriving (Show)
-
-number :: Parser Int
-number = read <$> many1 digit
 
 maskParser :: Parser Command
 maskParser = do

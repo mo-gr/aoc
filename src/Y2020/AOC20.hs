@@ -5,17 +5,15 @@ module Y2020.AOC20 where
 import           Data.Functor           ((<&>))
 import           Data.List              (find, nub, transpose)
 import           Data.Maybe             (catMaybes)
-import           Text.Parsec            (char, count, digit, endOfLine, many1,
-                                         string, (<|>))
+import           Text.Parsec            (char, count, endOfLine, many1, string,
+                                         (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 readPixel :: Char -> Pixel
 readPixel '.' = White
 readPixel '#' = Black
 readPixel _   = error "invalid pixel"
-
-number :: Parser Int
-number = read <$> many1 digit
 
 imageParser :: Parser Image
 imageParser = do

@@ -3,16 +3,13 @@
 module Y2020.AOC2 where
 
 import           Data.Either            (fromRight)
-import           Text.Parsec            (digit, letter, many1, skipMany, space,
-                                         string)
+import           Text.Parsec            (letter, many1, skipMany, space, string)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 data Policy = Policy { character::Char, minCount::Int, maxCount::Int } deriving (Show)
 
 type Password = String
-
-number :: Parser Int
-number = read <$> many1 digit
 
 policyParser :: Parser Policy
 policyParser = do

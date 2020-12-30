@@ -3,8 +3,9 @@
 module Y2020.AOC12 where
 
 import           Data.Either            (fromRight)
-import           Text.Parsec            (digit, endOfLine, many1, oneOf)
+import           Text.Parsec            (endOfLine, many1, oneOf)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 type Coord = (Int,Int)
 
@@ -19,9 +20,6 @@ data Command = N {arg :: Int}
  | L {arg :: Int}
  | R {arg :: Int}
  deriving (Show)
-
-number :: Parser Int
-number = read <$> many1 digit
 
 commandParser :: Parser Command
 commandParser = do

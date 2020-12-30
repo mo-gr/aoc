@@ -1,15 +1,12 @@
 module Y2020.AOC10 where
 
-import Text.Parsec ( endOfLine, digit, many1 )
-
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Data.Either (fromRight)
-import Data.List (sort)
+import           Data.Either            (fromRight)
+import           Data.List              (sort)
+import           Text.Parsec            (endOfLine, many1)
+import           Text.Parsec.ByteString (Parser, parseFromFile)
+import           Util                   (number)
 
 type Jolts = Int
-
-number :: Parser Int
-number = read <$> many1 digit
 
 inputParser :: Parser [Jolts]
 inputParser = many1 (number <* endOfLine)
@@ -34,7 +31,7 @@ countJoltDifferences n (x:y:xs) = if y - x == n
 
 dropTil :: Jolts -> [Jolts] -> [Jolts]
 dropTil c (x:xs) | x < c = dropTil c xs
-dropTil _c xs = xs
+dropTil _c xs    = xs
 
 sumPreviousTouches :: [Int] -> Int -> Int
 sumPreviousTouches [] _count = 1
@@ -47,7 +44,7 @@ countValidConfigurations :: [Jolts] -> Int
 countValidConfigurations jj = let
   indexes = [0..(length jj - 1)]
   countPreviousCompatible i = length . take 3 . filter (`isCompatible` (jj !! i)) $ take i jj
-  addPreviousTouches touches i = sumPreviousTouches touches (countPreviousCompatible i) : touches 
+  addPreviousTouches touches i = sumPreviousTouches touches (countPreviousCompatible i) : touches
   in
     last . reverse $ foldl addPreviousTouches [] indexes
 

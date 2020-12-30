@@ -1,11 +1,9 @@
 module Y2020.AOC9 where
 
 import           Data.Either            (fromRight)
-import           Text.Parsec            (digit, endOfLine, many1)
+import           Text.Parsec            (endOfLine, many1)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
-
-number :: Parser Int
-number = read <$> many1 digit
+import           Util                   (number)
 
 inputParser :: Parser [Int]
 inputParser = many1 (number <* endOfLine)

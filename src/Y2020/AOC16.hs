@@ -4,12 +4,10 @@ module Y2020.AOC16 where
 
 import           Data.Either            (fromRight)
 import qualified Data.Map.Strict        as M
-import           Text.Parsec            (char, digit, endOfLine, letter, many1,
-                                         sepBy1, space, string, (<|>))
+import           Text.Parsec            (char, endOfLine, letter, many1, sepBy1,
+                                         space, string, (<|>))
 import           Text.Parsec.ByteString (Parser, parseFromFile)
-
-number :: Parser Int
-number = read <$> many1 digit
+import           Util                   (number)
 
 ruleParser :: Parser Rule
 ruleParser = do
