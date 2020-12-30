@@ -31,4 +31,5 @@ executables:
 data-dir: data
 data-files:
   - '2020/*.input'
+  - '2019/*.input'
 stability: experimental
