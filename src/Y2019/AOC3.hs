@@ -89,12 +89,27 @@ origin = Point 0 0
 -- 1017
 solution1 :: IO Int
 solution1 = do
-  ops <- parseFromFile parseOp "AOC3.input"
+  ops <- parseFromFile parseOp "data/2019/AOC3.input"
   case ops of
     Left e -> error . show $ e
     Right wires ->
       return . findSmallestDistance . crossings $ wireToPointCloud <$> wires
 
 
-solution2 :: IO ()
-solution2 = error "no solution yet"
+stepsToCrossing :: Wire -> Point -> Int
+stepsToCrossing w cross = let wps = reverse $ foldl lineToPoints [] w
+                           in  length $ takeWhile (/= cross) wps
+
+-- 11432
+solution2 :: IO Int
+solution2 = do
+    ops <- parseFromFile parseOp "data/2019/AOC3.input"
+    case ops of
+      Left e -> error . show $ e
+      Right [w1, w2] -> do
+        let crosses = filter (/= origin) . Set.toList . crossings $ wireToPointCloud <$> [w1, w2]
+        return . minimum $ calculateCrossingValue w1 w2 <$> crosses
+      Right _ -> error "expecting exactly 2 wires"
+  where calculateCrossingValue :: Wire -> Wire -> Point -> Int
+        calculateCrossingValue w1 w2 p = stepsToCrossing w1 p + stepsToCrossing w2 p
+
