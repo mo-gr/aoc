@@ -30,6 +30,8 @@ executables:
       - src
 data-dir: data
 data-files:
+  - '2021/*.input'
   - '2020/*.input'
   - '2019/*.input'
+  - '2015/*.input'
 stability: experimental
