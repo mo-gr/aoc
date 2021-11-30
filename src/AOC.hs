@@ -2,8 +2,8 @@ module AOC where
 
 import Test.HUnit (Test)
 
-
-data Day = D1
+data Day
+  = D1
   | D2
   | D3
   | D4
@@ -30,15 +30,15 @@ data Day = D1
   | D25
 
 day :: String -> Maybe Day
-day "1"  = Just D1
-day "2"  = Just D2
-day "3"  = Just D3
-day "4"  = Just D4
-day "5"  = Just D5
-day "6"  = Just D6
-day "7"  = Just D7
-day "8"  = Just D8
-day "9"  = Just D9
+day "1" = Just D1
+day "2" = Just D2
+day "3" = Just D3
+day "4" = Just D4
+day "5" = Just D5
+day "6" = Just D6
+day "7" = Just D7
+day "8" = Just D8
+day "9" = Just D9
 day "10" = Just D10
 day "11" = Just D11
 day "12" = Just D12
@@ -55,13 +55,13 @@ day "22" = Just D22
 day "23" = Just D23
 day "24" = Just D24
 day "25" = Just D25
-day _    = Nothing
+day _ = Nothing
 
 class AOC a where
   solution :: a -> Day -> (IO String, IO String)
   inputDir :: a -> String
   showYear :: a -> String
-  verify :: a ->  Test
+  verify :: a -> Test
 
 unify :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
 unify (a, b) = (show <$> a, show <$> b)

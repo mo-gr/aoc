@@ -2,19 +2,19 @@
 
 module Main where
 
-import           AOC
-import           Data.Maybe         (fromMaybe)
-import           Paths_AOC
-import           System.Directory
-import           System.Environment
-import           Y2021.AOC          (Y2021 (Y2021))
-import           Y2020.AOC          (Y2020 (Y2020))
-import           Y2019.AOC          (Y2019 (Y2019))
-import           Y2015.AOC          (Y2015 (Y2015))
+import AOC
+import Data.Maybe (fromMaybe)
+import Paths_AOC
+import System.Directory
+import System.Environment
 import Test.HUnit (runTestTT)
+import Y2015.AOC (Y2015 (Y2015))
+import Y2019.AOC (Y2019 (Y2019))
+import Y2020.AOC (Y2020 (Y2020))
+import Y2021.AOC (Y2021 (Y2021))
 
 safeHead :: [a] -> Maybe a
-safeHead []      = Nothing
+safeHead [] = Nothing
 safeHead (a : _) = Just a
 
 format :: (Show a, Show b) => IO a -> IO b -> IO ()
@@ -25,6 +25,7 @@ format s1 s2 = do
   s2 >>= print
 
 data Year = Y21 | Y20 | Y19 | Y15
+
 instance AOC Year where
   showYear Y21 = showYear Y2021
   showYear Y20 = showYear Y2020
@@ -47,20 +48,20 @@ main :: IO ()
 main = do
   arg <- getArgs
   let year = case arg of
-              ("2015":_) -> Y15
-              ("2019":_) -> Y19
-              ("2020":_) -> Y20
-              _ -> Y21
+        ("2015" : _) -> Y15
+        ("2019" : _) -> Y19
+        ("2020" : _) -> Y20
+        _ -> Y21
   let maybeDay = case arg of
-                  (_:d:_) -> day d
-                  _ -> Nothing
+        (_ : d : _) -> day d
+        _ -> Nothing
   putStrLn $ "Advent of Code " ++ showYear year ++ " - Day " ++ fromMaybe "" (safeHead arg)
   putStrLn $ "https://adventofcode.com/" ++ showYear year
   dataDir <- getDataDir
   setCurrentDirectory $ dataDir ++ inputDir year
   case maybeDay of
     Nothing -> do
-       _ <- putStrLn $ "Verify year " ++ showYear year
-       _ <- runTestTT $ verify year
-       return ()
-    Just d  -> uncurry format (solution year d)
+      _ <- putStrLn $ "Verify year " ++ showYear year
+      _ <- runTestTT $ verify year
+      return ()
+    Just d -> uncurry format (solution year d)
