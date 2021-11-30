@@ -17,12 +17,14 @@ import qualified Y2019.AOC6
 import qualified Y2019.AOC7
 import qualified Y2019.AOC8
 import qualified Y2019.AOC9
+import Test.HUnit (Test(TestList))
 
 data Y2019 = Y2019
 
 instance AOC Y2019 where
   showYear Y2019 = "2019"
   inputDir Y2019 = "/2019"
+  verify Y2019 = verify2019
   solution Y2019 D1  = unify (Y2019.AOC1.solution1, Y2019.AOC1.solution2)
   solution Y2019 D2  = unify (Y2019.AOC2.solution1, Y2019.AOC2.solution2)
   solution Y2019 D3  = unify (Y2019.AOC3.solution1, Y2019.AOC3.solution2)
@@ -40,3 +42,7 @@ instance AOC Y2019 where
   solution Y2019 D15 = unify (Y2019.AOC15.solution1, Y2019.AOC15.solution2)
   solution Y2019 D16 = unify (Y2019.AOC16.solution1, Y2019.AOC16.solution2)
   solution Y2019 _   = error "not yet"
+
+verify2019 :: Test
+verify2019 = TestList [
+  ]

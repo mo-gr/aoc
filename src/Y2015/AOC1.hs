@@ -4,7 +4,7 @@ import Text.Parsec ( string, (<|>), many1)
 
 import Text.Parsec.ByteString (Parser, parseFromFile)
 import Data.Either (fromRight)
-
+import Test.HUnit (Test(TestList, TestCase), assertEqual )
 
 data Command = Up | Down
 
@@ -33,11 +33,17 @@ executeTilBasement cs = snd' $ foldl f (0, 0, NotYet) cs
 -- 280
 solution1 :: IO Int
 solution1 = do
-  commands <- fromRight [] <$> parseFromFile inputParser "data/2015/AOC1.input"
+  commands <- fromRight [] <$> parseFromFile inputParser "AOC1.input"
   return $ execute commands
 
 -- 1797
 solution2 :: IO Int
 solution2 = do
-  commands <- fromRight [] <$> parseFromFile inputParser "data/2015/AOC1.input"
+  commands <- fromRight [] <$> parseFromFile inputParser "AOC1.input"
   return $ executeTilBasement commands
+
+verify :: Test
+verify = TestList [
+  TestCase (solution1 >>= assertEqual "solution 1" 280 ),
+  TestCase (solution2 >>= assertEqual "solution 2" 1797 )
+  ]

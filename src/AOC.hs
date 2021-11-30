@@ -1,5 +1,8 @@
 module AOC where
 
+import Test.HUnit (Test)
+
+
 data Day = D1
   | D2
   | D3
@@ -58,6 +61,7 @@ class AOC a where
   solution :: a -> Day -> (IO String, IO String)
   inputDir :: a -> String
   showYear :: a -> String
+  verify :: a ->  Test
 
 unify :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
 unify (a, b) = (show <$> a, show <$> b)

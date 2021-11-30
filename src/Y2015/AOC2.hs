@@ -5,7 +5,7 @@ import Util (number)
 import Text.Parsec (char, sepBy1)
 import Data.Either (fromRight)
 import Data.List (sort)
-
+import Test.HUnit (Test(TestList, TestCase), assertEqual )
 
 type Box = (Int, Int, Int)
 
@@ -42,11 +42,17 @@ ribbon box = bow box + wrap box
 -- 1588178
 solution1 :: IO Int
 solution1 = do
-  boxes <- fromRight [] <$> parseFromFile inputParser "data/2015/AOC2.input"
+  boxes <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
   return $ sum $ map boxPaper boxes
 
 -- 3783758
 solution2 :: IO Int
 solution2 = do
-  boxes <- fromRight [] <$> parseFromFile inputParser "data/2015/AOC2.input"
+  boxes <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
   return $ sum $ map ribbon boxes
+
+verify :: Test
+verify = TestList [
+  TestCase (solution1 >>= assertEqual "solution 1" 1588178 ),
+  TestCase (solution2 >>= assertEqual "solution 2" 3783758 )
+  ]

@@ -26,12 +26,14 @@ import qualified Y2020.AOC6
 import qualified Y2020.AOC7
 import qualified Y2020.AOC8
 import qualified Y2020.AOC9
+import Test.HUnit (Test(TestList))
 
 data Y2020 = Y2020
 
 instance AOC Y2020 where
   showYear Y2020 = "2020"
   inputDir Y2020 = "/2020"
+  verify Y2020 = verify2020
   solution Y2020 D1  = unify (Y2020.AOC1.solution1, Y2020.AOC1.solution2)
   solution Y2020 D2  = unify (Y2020.AOC2.solution1, Y2020.AOC2.solution2)
   solution Y2020 D3  = unify (Y2020.AOC3.solution1, Y2020.AOC3.solution2)
@@ -57,3 +59,7 @@ instance AOC Y2020 where
   solution Y2020 D23 = unify (Y2020.AOC23.solution1, Y2020.AOC23.solution2)
   solution Y2020 D24 = unify (Y2020.AOC24.solution1, Y2020.AOC24.solution2)
   solution Y2020 D25 = unify (Y2020.AOC25.solution1, Y2020.AOC25.solution2)
+
+verify2020 :: Test
+verify2020 = TestList [
+  ]
