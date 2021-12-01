@@ -2,10 +2,9 @@ module Y2021.AOC where
 
 import AOC
 import qualified Data.ByteString.Char8 as C
-import Test.HUnit (Test (TestList))
+import Test.HUnit (Test (TestLabel, TestList))
 import qualified Util (withPath)
 import qualified Y2021.AOC1
-import Control.Exception (bracket)
 
 data Y2021 = Y2021
 
@@ -19,13 +18,14 @@ instance AOC Y2021 where
 loadInput :: String -> IO C.ByteString
 loadInput d = C.readFile $ d ++ ".input"
 
-run :: (a -> b) -> (a -> c) -> IO a -> (IO b, IO c)
-run f g a = (f <$> a, g <$> a)
+run :: (Show b, Show c) => (a -> b) -> (a -> c) -> IO a -> (IO String, IO String)
+run f g a = (show . f <$> a, show . g <$> a)
 
 verify2021 :: Test
 verify2021 =
   TestList
-    []
+    [ TestLabel "Day 1" $ Y2021.AOC1.verify (loadInput "AOC1")
+    ]
 
 inRepl1 :: Day -> IO String
 inRepl1 d = Util.withPath Y2021 $ fst $ solution Y2021 d
