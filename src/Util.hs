@@ -3,13 +3,18 @@ module Util where
 import Control.Exception (bracket)
 import qualified Data.ByteString.Char8 as C
 import System.Directory
-import Text.Parsec (digit, many1)
+import Text.Parsec (digit, many1, runP)
 import Text.Parsec.ByteString (Parser)
 
 type Input = C.ByteString
 
 number :: Parser Int
 number = read <$> many1 digit
+
+parseOrDie :: Parser p -> Input -> p
+parseOrDie parser input = case runP parser () "" input of
+  Left err -> error $ show err
+  Right parsed -> parsed
 
 safeHead :: [a] -> Maybe a
 safeHead [] = Nothing

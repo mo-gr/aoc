@@ -1,10 +1,9 @@
 module Y2021.AOC1 where
 
-import Data.Either (fromRight)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
-import Text.Parsec (newline, runP, sepBy1)
+import Text.Parsec (newline, sepBy1)
 import Text.Parsec.ByteString (Parser)
-import Util (Input, number, (|>))
+import Util (Input, number, (|>), parseOrDie)
 
 type Measurement = Int
 
@@ -25,13 +24,13 @@ tripletSum xs = sum3 <$> zip3 xs (tail xs) (tail $ tail xs)
 -- 1162
 solution1 :: Input -> Int
 solution1 input =
-  fromRight [] (runP inputParser () "" input)
+  parseOrDie inputParser input
     |> countIncreases
 
 -- 1190
 solution2 :: Input -> Int
 solution2 input =
-  fromRight [] (runP inputParser () "" input)
+  parseOrDie inputParser input
     |> tripletSum
     |> countIncreases
 
