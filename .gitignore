@@ -2,3 +2,4 @@
 tags
 *.dump-hi
 AOC.cabal
+.session
