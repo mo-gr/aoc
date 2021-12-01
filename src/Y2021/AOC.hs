@@ -3,6 +3,7 @@ module Y2021.AOC where
 import AOC
 import qualified Data.ByteString.Char8 as C
 import Test.HUnit (Test (TestLabel, TestList))
+import Util (Input)
 import qualified Util (withPath)
 import qualified Y2021.AOC1
 
@@ -15,7 +16,7 @@ instance AOC Y2021 where
   solution Y2021 D1 = run Y2021.AOC1.solution1 Y2021.AOC1.solution2 $ loadInput "AOC1"
   solution Y2021 _ = error "not yet"
 
-loadInput :: String -> IO C.ByteString
+loadInput :: String -> IO Input
 loadInput d = C.readFile $ d ++ ".input"
 
 run :: (Show b, Show c) => (a -> b) -> (a -> c) -> IO a -> (IO String, IO String)

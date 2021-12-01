@@ -1,11 +1,10 @@
 module Y2021.AOC1 where
 
-import qualified Data.ByteString.Char8 as C
 import Data.Either (fromRight)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (newline, runP, sepBy1)
 import Text.Parsec.ByteString (Parser)
-import Util (number)
+import Util (Input, number, (|>))
 
 type Measurement = Int
 
@@ -18,18 +17,25 @@ countIncreases (m : m' : ms)
   | otherwise = countIncreases (m' : ms)
 countIncreases _ = 0
 
-triplets :: Num a => [a] -> [a]
-triplets xs = (\(a, b, c) -> a + b + c) <$> zip3 xs (tail xs) (tail $ tail xs)
+tripletSum :: Num a => [a] -> [a]
+tripletSum xs = sum3 <$> zip3 xs (tail xs) (tail $ tail xs)
+  where
+    sum3 (a, b, c) = a + b + c
 
 -- 1162
-solution1 :: C.ByteString -> Int
-solution1 input = countIncreases $ fromRight [] $ runP inputParser () "" input
+solution1 :: Input -> Int
+solution1 input =
+  fromRight [] (runP inputParser () "" input)
+    |> countIncreases
 
 -- 1190
-solution2 :: C.ByteString -> Int
-solution2 input = countIncreases . triplets $ fromRight [] $ runP inputParser () "" input
+solution2 :: Input -> Int
+solution2 input =
+  fromRight [] (runP inputParser () "" input)
+    |> tripletSum
+    |> countIncreases
 
-verify :: IO C.ByteString -> Test
+verify :: IO Input -> Test
 verify input =
   TestList
     [ TestCase $ assertEqual "solution 1" 1162 . solution1 =<< input,

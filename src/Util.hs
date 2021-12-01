@@ -2,9 +2,12 @@ module Util where
 
 import AOC
 import Control.Exception (bracket)
+import qualified Data.ByteString.Char8 as C
 import System.Directory
 import Text.Parsec (digit, many1)
 import Text.Parsec.ByteString (Parser)
+
+type Input = C.ByteString
 
 number :: Parser Int
 number = read <$> many1 digit
@@ -21,3 +24,6 @@ withPath a op =
     (setupPath a)
     setCurrentDirectory
     (const op)
+
+(|>) :: a -> (a -> c) -> c
+(|>) = flip ($)
