@@ -1,10 +1,14 @@
 module Y2015.AOC where
 
-import AOC
+import AOC (Day (..), Year (), mkYear)
 import Test.HUnit (Test (TestLabel, TestList))
+import Util (unify)
 import qualified Y2015.AOC1
 import qualified Y2015.AOC2
 import qualified Y2015.AOC3
+
+year :: Year
+year = mkYear "2015" solution verify
 
 solution :: Day -> (IO String, IO String)
 solution D1 = unify (Y2015.AOC1.solution1, Y2015.AOC1.solution2)

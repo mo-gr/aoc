@@ -1,12 +1,15 @@
 module Y2021.AOC where
 
-import AOC (Day (..))
+import AOC (Day (..), Year (), mkYear)
 import qualified Data.ByteString.Char8 as C
 import Test.HUnit (Test (TestLabel, TestList))
 import Util (Input)
 import qualified Util (withPath)
 import qualified Y2021.AOC1
 import qualified Y2021.AOC2
+
+year :: Year
+year = mkYear "2021" solution verify
 
 solution :: Day -> (IO String, IO String)
 solution D1 = run Y2021.AOC1.solution1 Y2021.AOC1.solution2 $ loadInput "AOC1"

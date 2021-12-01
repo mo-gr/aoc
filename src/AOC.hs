@@ -57,11 +57,19 @@ day "24" = Just D24
 day "25" = Just D25
 day _ = Nothing
 
-class AOC a where
-  solution :: a -> Day -> (IO String, IO String)
-  inputDir :: a -> String
-  showYear :: a -> String
-  verify :: a -> Test
+data Year = Year
+  { solution :: Day -> (IO String, IO String),
+    inputDir :: String,
+    showYear :: String,
+    verify :: Test
+  }
 
-unify :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
-unify (a, b) = (show <$> a, show <$> b)
+mkYear :: String -> (Day -> (IO String, IO String)) -> Test -> Year
+mkYear y s v =
+  Year
+    { solution = s,
+      inputDir = "/" ++ y,
+      showYear = y,
+      verify = v
+    }
+

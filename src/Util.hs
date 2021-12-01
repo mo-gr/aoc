@@ -30,3 +30,6 @@ withPath dir op =
 
 (|>) :: a -> (a -> c) -> c
 (|>) = flip ($)
+
+unify :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
+unify (a, b) = (show <$> a, show <$> b)
