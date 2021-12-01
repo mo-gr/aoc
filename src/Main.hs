@@ -8,14 +8,11 @@ import Paths_AOC
 import System.Directory
 import System.Environment
 import Test.HUnit (runTestTT)
-import Y2015.AOC (Y2015 (Y2015))
+import Util (safeHead)
+import qualified Y2015.AOC as Y2015 (solution, verify)
 import Y2019.AOC (Y2019 (Y2019))
 import Y2020.AOC (Y2020 (Y2020))
-import Y2021.AOC (Y2021 (Y2021))
-
-safeHead :: [a] -> Maybe a
-safeHead [] = Nothing
-safeHead (a : _) = Just a
+import qualified Y2021.AOC as Y2021 (solution, verify)
 
 format :: (Show a, Show b) => IO a -> IO b -> IO ()
 format s1 s2 = do
@@ -27,22 +24,22 @@ format s1 s2 = do
 data Year = Y21 | Y20 | Y19 | Y15
 
 instance AOC Year where
-  showYear Y21 = showYear Y2021
+  showYear Y21 = "2021"
   showYear Y20 = showYear Y2020
   showYear Y19 = showYear Y2019
-  showYear Y15 = showYear Y2015
-  inputDir Y21 = inputDir Y2021
+  showYear Y15 = "2015"
+  inputDir Y21 = "/2021"
   inputDir Y20 = inputDir Y2020
   inputDir Y19 = inputDir Y2019
-  inputDir Y15 = inputDir Y2015
-  solution Y21 = solution Y2021
+  inputDir Y15 = "/2015"
+  solution Y21 = Y2021.solution
   solution Y20 = solution Y2020
   solution Y19 = solution Y2019
-  solution Y15 = solution Y2015
-  verify Y21 = verify Y2021
+  solution Y15 = Y2015.solution
+  verify Y21 = Y2021.verify
   verify Y20 = verify Y2020
   verify Y19 = verify Y2019
-  verify Y15 = verify Y2015
+  verify Y15 = Y2015.verify
 
 main :: IO ()
 main = do

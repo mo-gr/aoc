@@ -1,6 +1,5 @@
 module Util where
 
-import AOC
 import Control.Exception (bracket)
 import qualified Data.ByteString.Char8 as C
 import System.Directory
@@ -12,16 +11,20 @@ type Input = C.ByteString
 number :: Parser Int
 number = read <$> many1 digit
 
-setupPath :: (AOC a) => a -> IO FilePath
-setupPath a = do
+safeHead :: [a] -> Maybe a
+safeHead [] = Nothing
+safeHead (a : _) = Just a
+
+setupPath :: String -> IO FilePath
+setupPath dir = do
   oldDirectory <- getCurrentDirectory
-  setCurrentDirectory $ "data" ++ inputDir a
+  setCurrentDirectory $ "data/" ++ dir
   pure oldDirectory
 
-withPath :: (AOC a) => a -> IO b -> IO b
-withPath a op =
+withPath :: String -> IO b -> IO b
+withPath dir op =
   bracket
-    (setupPath a)
+    (setupPath dir)
     setCurrentDirectory
     (const op)
 
