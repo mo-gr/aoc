@@ -1,10 +1,10 @@
 module Y2021.AOC2 where
 
-import Debug.Trace
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, newline, string, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
+import Data.Functor (($>))
 
 data Direction = Up Int | Down Int | Forward Int deriving (Show, Eq)
 
@@ -20,7 +20,7 @@ startingPos = Position 0 0 0
 
 directionParser :: Parser Direction
 directionParser = do
-  dir <- string "forward " *> pure Forward <|> string "down " *> pure Down <|> string "up " *> pure Up
+  dir <- string "forward " $> Forward <|> string "down " $> Down <|> string "up " $> Up
   dist <- number <* newline
   pure $ dir dist
 
@@ -28,7 +28,7 @@ inputParser :: Parser [Direction]
 inputParser = many1 directionParser
 
 result :: Position -> Int
-result (Position d h a) = d * h
+result (Position d h _a) = d * h
 
 eval :: Position -> [Direction] -> Position
 eval = foldl step
