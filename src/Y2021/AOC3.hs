@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Y2021.AOC3 where
 
 import Data.Functor (($>))
