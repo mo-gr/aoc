@@ -10,6 +10,7 @@ import qualified Y2021.AOC2
 import qualified Y2021.AOC3
 import qualified Y2021.AOC4
 import qualified Y2021.AOC5
+import qualified Y2021.AOC6
 
 year :: Year
 year = mkYear "2021" solution verify
@@ -20,6 +21,7 @@ solution D2 = run Y2021.AOC2.solution1 Y2021.AOC2.solution2 $ loadInput "AOC2"
 solution D3 = run Y2021.AOC3.solution1 Y2021.AOC3.solution2 $ loadInput "AOC3"
 solution D4 = run Y2021.AOC4.solution1 Y2021.AOC4.solution2 $ loadInput "AOC4"
 solution D5 = run Y2021.AOC5.solution1 Y2021.AOC5.solution2 $ loadInput "AOC5"
+solution D6 = run Y2021.AOC6.solution1 Y2021.AOC6.solution2 $ loadInput "AOC6"
 solution _ = error "not yet"
 
 loadInput :: String -> IO Input
