@@ -38,3 +38,7 @@ withPath dir op =
 
 unify :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
 unify (a, b) = (show <$> a, show <$> b)
+
+times :: Int -> (a -> a) -> a -> a
+times 0 _ a = a
+times n f a = times (n - 1) f (f a)

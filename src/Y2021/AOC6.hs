@@ -6,7 +6,7 @@ import qualified Data.Map.Strict as M
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, sepBy)
 import Text.Parsec.ByteString (Parser)
-import Util (Input, number, parseOrDie, (|>))
+import Util (Input, number, parseOrDie, times, (|>))
 
 type Fish = Int
 
@@ -59,7 +59,3 @@ evolveTank = M.foldrWithKey f emptyTank
 
 countFish :: FishTank -> Int
 countFish = M.foldr (+) 0
-
-times :: Int -> (a -> a) -> a -> a
-times 0 _ a = a
-times n f a = times (n - 1) f (f a)
