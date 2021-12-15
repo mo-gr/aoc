@@ -10,10 +10,11 @@ import Text.Parsec (many1, digit, newline)
 import Data.List (minimumBy)
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
+import Data.Bifunctor (bimap)
 
 type Risk = Int
 
-type Cave = [[Risk]]
+type Cave = M.Map Point Risk
 
 type Point = (Int, Int)
 type Path = [Point]
@@ -22,25 +23,29 @@ risk :: Parser [Risk]
 risk = fmap digitToInt <$> many1 digit
 
 inputParser :: Parser Cave
-inputParser = many1 (risk <* newline)
+inputParser = do
+  listOfLists <- many1 (risk <* newline)
+  pure $ M.fromList (kvPairs listOfLists)
+    where
+      kvPairs :: [[Risk]] -> [(Point, Risk)]
+      kvPairs os = do
+        x <- [0 .. length (head os) - 1]
+        y <- [0 .. length os - 1]
+        pure ((x, y), (os !! y) !! x)
 
 runAStar :: Cave -> Path
 runAStar c = let start = (0,0)
-                 end =  (length (head c) - 1, length c - 1)
-             in aStar c start end (getAt c)
+                 (end, _) = M.findMax c
+             in aStar c start end (c M.!)
 
 runAStarCost :: Cave -> Int
-runAStarCost c = runAStar c |> fmap (getAt c) |> reverse |> drop 1 |> sum
-
-getAt :: Cave -> Point -> Risk
-getAt c (x, y) = (c !! y) !! x
+runAStarCost c = runAStar c |> fmap (c M.!) |> reverse |> drop 1 |> sum
 
 neighbours :: Point -> Cave -> [Point]
 neighbours (x, y) c = filter bounds
   [(x - 1, y), (x + 1, y), (x, y -1), (x, y + 1)]
   where
-    mx = length (head c) - 1
-    my = length c - 1
+    ((mx, my), _) = M.findMax c
     bounds (x', _) | x' < 0 || x' > mx = False
     bounds (_, y') | y' < 0 || y' > my = False
     bounds (x', y') | x == x' && y == y' = False
@@ -62,9 +67,9 @@ aStar :: Cave -> Point -> Point -> (Point -> Risk) -> Path
 aStar c start end costFn = recur (S.singleton start) M.empty (M.fromList [(start, 0)])
   where recur :: S.Set Point -> M.Map Point Point -> M.Map Point Risk -> Path
         recur s _f _c  | s == S.empty = error "no path"
-        recur openSet from cost = 
+        recur openSet from cost =
           let curr = minimumBy (\a b -> compare (findOrInfinity a cost) (findOrInfinity b cost)) $ S.toList openSet
-          in if curr == end 
+          in if curr == end
              then reconstruct from curr
              else let openSet' = S.delete curr openSet
                       ns = neighbours curr c
@@ -79,19 +84,22 @@ inc :: Risk -> Risk
 inc 9 = 1
 inc n = n+1
 
-fiveFold :: [Risk] -> [Risk]
-fiveFold r = r 
-  ++ (inc <$> r)
-  ++ (inc.inc <$> r)
-  ++ (inc.inc.inc <$> r)
-  ++ (inc.inc.inc.inc <$> r)
-
 blowUp :: Cave -> Cave
-blowUp c = (fiveFold <$> c )
-  ++ (fmap inc <$> (fiveFold <$> c ))
-  ++ (fmap (inc.inc) <$> (fiveFold <$> c ))
-  ++ (fmap (inc.inc.inc) <$> (fiveFold <$> c ))
-  ++ (fmap (inc.inc.inc.inc) <$> (fiveFold <$> c ))
+blowUp c = let orig = M.toList c 
+               ((mx', my'), _) = M.findMax c
+               mx = mx' + 1
+               my = my' + 1
+               horizontal = orig 
+                 ++ (orig |> fmap (bimap (\(x,y) -> (x+mx,y)) inc))  
+                 ++ (orig |> fmap (bimap (\(x,y) -> (x+mx+mx,y)) (inc.inc)))  
+                 ++ (orig |> fmap (bimap (\(x,y) -> (x+mx+mx+mx,y)) (inc.inc.inc)))  
+                 ++ (orig |> fmap (bimap (\(x,y) -> (x+mx+mx+mx+mx,y)) (inc.inc.inc.inc)))
+               vertical = horizontal
+                 ++ (horizontal |> fmap (bimap (\(x,y) -> (x,y+my)) inc))
+                 ++ (horizontal |> fmap (bimap (\(x,y) -> (x,y+my+my)) (inc.inc)))
+                 ++ (horizontal |> fmap (bimap (\(x,y) -> (x,y+my+my+my)) (inc.inc.inc)))
+                 ++ (horizontal |> fmap (bimap (\(x,y) -> (x,y+my+my+my+my)) (inc.inc.inc.inc)))
+           in M.fromList vertical  
 
 -- 388
 solution1 :: Input -> Int
