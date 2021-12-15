@@ -20,7 +20,9 @@ startingPos = Position 0 0 0
 
 directionParser :: Parser Direction
 directionParser = do
-  dir <- string "forward " $> Forward <|> string "down " $> Down <|> string "up " $> Up
+  dir <- string "forward " $> Forward 
+      <|> string "down " $> Down 
+      <|> string "up " $> Up
   dist <- number <* newline
   pure $ dir dist
 
