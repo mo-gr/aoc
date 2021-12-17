@@ -3,13 +3,17 @@ module Util where
 import Control.Exception (bracket)
 import qualified Data.ByteString.Char8 as C
 import System.Directory
-import Text.Parsec (digit, many1, runP)
+import Text.Parsec (digit, many1, runP, char, (<|>))
 import Text.Parsec.ByteString (Parser)
 
 type Input = C.ByteString
 
 number :: Parser Int
 number = read <$> many1 digit
+
+negativeNumber :: Parser Int
+negativeNumber = do
+  (negate <$> (char '-' *> number)) <|> number
 
 parseOrDie :: Parser p -> Input -> p
 parseOrDie parser input = case runP parser () "" input of
