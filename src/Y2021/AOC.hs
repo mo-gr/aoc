@@ -20,6 +20,7 @@ import qualified Y2021.AOC12
 import qualified Y2021.AOC13
 import qualified Y2021.AOC14
 import qualified Y2021.AOC15
+import qualified Y2021.AOC16
 
 year :: Year
 year = mkYear "2021" solution verify
@@ -40,6 +41,7 @@ solution D12 = run Y2021.AOC12.solution1 Y2021.AOC12.solution2 $ loadInput "AOC1
 solution D13 = run Y2021.AOC13.solution1 Y2021.AOC13.solution2 $ loadInput "AOC13"
 solution D14 = run Y2021.AOC14.solution1 Y2021.AOC14.solution2 $ loadInput "AOC14"
 solution D15 = run Y2021.AOC15.solution1 Y2021.AOC15.solution2 $ loadInput "AOC15"
+solution D16 = run Y2021.AOC16.solution1 Y2021.AOC16.solution2 $ loadInput "AOC16"
 solution _ = error "not yet"
 
 loadInput :: String -> IO Input
@@ -65,7 +67,8 @@ verify =
       TestLabel "Day 12" $ Y2021.AOC12.verify (loadInput "AOC12"),
       TestLabel "Day 13" $ Y2021.AOC13.verify (loadInput "AOC13"),
       TestLabel "Day 14" $ Y2021.AOC14.verify (loadInput "AOC14"),
-      TestLabel "Day 15" $ Y2021.AOC15.verify (loadInput "AOC15")
+      TestLabel "Day 15" $ Y2021.AOC15.verify (loadInput "AOC15"),
+      TestLabel "Day 16" $ Y2021.AOC16.verify (loadInput "AOC16")
     ]
 
 inRepl1 :: Day -> IO String
