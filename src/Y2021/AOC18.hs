@@ -6,13 +6,12 @@ import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>), number)
 import Text.Parsec (char, (<|>), many1, newline, many)
-import Debug.Trace
 
 data SnailNumber = Number Int | Pair SnailNumber SnailNumber
   deriving (Eq)
 
 isPair :: SnailNumber -> Bool
-isPair (Pair n m) = True
+isPair (Pair _n _m) = True
 isPair _ = False
 
 instance Show SnailNumber where
@@ -32,19 +31,19 @@ inputParser :: Parser [SnailNumber]
 inputParser = many1 (snailParser <* many newline)
 
 addSnail :: SnailNumber -> SnailNumber -> SnailNumber
-addSnail = Pair
+addSnail n m =  Pair n m |> reduceSnail
 
 reduceSnail :: SnailNumber -> SnailNumber
 reduceSnail = reduceSnail' 0
 
 reduceSnail' :: Int -> SnailNumber -> SnailNumber
 reduceSnail' 10000 n = error $ "too deep " ++  show n
-reduceSnail' r n =  let exp = explode n
-                        spt = split exp
-                    in if n /= exp
-                       then reduceSnail' (r+1) exp
-                       else if n /= spt
-                            then reduceSnail' (r+1) spt
+reduceSnail' r n =  let expl = explode n
+                        splt = split expl
+                    in if n /= expl
+                       then reduceSnail' (r+1) expl
+                       else if n /= splt
+                            then reduceSnail' (r+1) splt
                             else n
 
 explode :: SnailNumber -> SnailNumber
@@ -57,10 +56,6 @@ addLeft x (Pair n m) = Pair (addLeft x n) m
 addRight :: Int -> SnailNumber -> SnailNumber
 addRight x (Number n) = Number $ x + n
 addRight x (Pair n m) = Pair n (addRight x m)
-
-ltr :: SnailNumber -> [Int]
-ltr (Number n) = [n]
-ltr (Pair n m) = ltr n ++ ltr m
 
 explode' :: Int -> SnailNumber -> (SnailNumber, Maybe (Int, Int))
 explode' _ (Number n) = (Number n, Nothing)
@@ -91,7 +86,8 @@ explode' rec (Pair n m) =
       Nothing -> (Pair nExp mExp, Nothing)
 
 
-split sn = case split' sn of
+split :: SnailNumber -> SnailNumber
+split n = case split' n of
   Left sn -> sn
   Right sn -> sn
 
@@ -104,20 +100,12 @@ split' (Pair n m) = case split' n of
     Right smSplit -> Right $ Pair snSplit smSplit
     Left smSplit -> Left $ Pair snSplit smSplit
 
-split2 :: SnailNumber -> SnailNumber
-split2 (Pair n m) = let n' = split2 n in
-                    if isPair n' && not (isPair n) then Pair n' m else Pair n' (split2 m)
-split2 (Number n) | n < 10 = Number n
-split2 (Number n) = Pair (Number (n `div` 2)) (Number ((n `div` 2) + (n `mod` 2)))
-
 magnitude :: SnailNumber -> Int
 magnitude (Number n) = n
 magnitude (Pair n m) = (3 * magnitude n) + (2 * magnitude m)
 
 sumSnail :: [SnailNumber] -> SnailNumber
-sumSnail = foldl1 f
-  where f n m = addSnail n m |> reduceSnail
-
+sumSnail = foldl1 addSnail
 
 -- 3524
 solution1 :: Input -> Int
@@ -127,7 +115,7 @@ solution1 input =
     |> magnitude
 
 allPairs :: Eq a => [a] -> [(a,a)]
-allPairs xs = filter (\(x,y) -> x /= y) $ do
+allPairs xs = filter (uncurry (/=)) $ do
   x <- xs
   y <- xs
   pure (x,y)
