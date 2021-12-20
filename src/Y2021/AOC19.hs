@@ -2,15 +2,14 @@
 
 module Y2021.AOC19 where
 
+import Data.List (delete, find, intersectBy, union)
+import Data.Maybe (fromJust)
 import qualified Data.Set as S
-import qualified Data.Map.Strict as M
+import Debug.Trace
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many, many1, newline, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, negativeNumber, number, parseOrDie, (|>))
-import Debug.Trace
-import Data.List (intersectBy, find, union, delete)
-import Data.Maybe (fromJust)
 
 type Point = (Int, Int, Int)
 
@@ -56,11 +55,11 @@ subV :: Point -> Point -> Point
 subV a b = addV a $ negateV b
 
 negateV :: Vector -> Vector
-negateV (x,y,z) = (-x,-y,-z)
+negateV (x, y, z) = (- x, - y, - z)
 
 adjust :: Scanner -> Point -> Scanner
-adjust (Just origin, _) _ = error "adjusting already adjusted scanner"
-adjust (Nothing, bs) t = (Just (0,0,0), fmap (translate (negateV t)) bs)
+adjust (Just _origin, _) _ = error "adjusting already adjusted scanner"
+adjust (Nothing, bs) t = (Just (0, 0, 0), fmap (translate (negateV t)) bs)
 
 manhattan :: Point -> Point -> Int
 manhattan (x, y, z) (x', y', z') =
@@ -105,56 +104,57 @@ candidates s ss = filter (/= s) ss |> fmap findPairWiseManhattan |> filter over1
 intersectVia :: Eq b => (a -> b) -> [a] -> [a] -> [a]
 intersectVia f = intersectBy (\a a' -> f a == f a')
 
-
-matches :: [(Point -> Point)] -> Scanner -> Scanner -> Scanner -> Maybe (Scanner,Scanner)
+matches :: [Point -> Point] -> Scanner -> Scanner -> Scanner -> Maybe (Scanner, Scanner)
 matches tForms orig preTransform scan =
   let oDist = pairWiseDeltas . snd $ orig
       sDist = pairWiseDeltas . snd $ scan
       common = intersectVia fst3 oDist sDist
    in if length common >= 12
-        then Just $ (preTransform, locate oDist sDist common scan)
+        then Just (preTransform, locate oDist sDist common scan)
         else
           if null tForms
             then Nothing
             else matches (tail tForms) orig preTransform (fmap (fmap (head tForms)) scan)
 
 locate :: [(Vector, Beacon, Beacon)] -> [(Vector, Beacon, Beacon)] -> [(Vector, Beacon, Beacon)] -> Scanner -> Scanner
-locate orig scan [] s = error "unable to locate"
-locate orig scan ((d, b, b'):cs) (_, bs) =
-  let Just (_, ob, ob') = find ((== d).fst3) orig
-      Just (_, sb, sb') = find ((== d).fst3) scan
-  in if (subV ob sb) == (subV ob' sb') then (Just (subV ob sb), bs)
-     else error "wrong assumption"
+locate _orig _scan [] _s = error "unable to locate"
+locate orig scan ((d, _b, _b') : _cs) (_, bs) =
+  let (_, ob, ob') = fromJust $ find ((== d) . fst3) orig
+      (_, sb, sb') = fromJust $ find ((== d) . fst3) scan
+   in if subV ob sb == subV ob' sb'
+        then (Just (subV ob sb), bs)
+        else error "wrong assumption"
 
 adjustScanner :: Scanner -> Scanner
 adjustScanner (Nothing, bs) = (Nothing, bs)
-adjustScanner (Just p, bs) = (Just (0,0,0), addV p <$> bs)
+adjustScanner (Just p, bs) = (Just (0, 0, 0), addV p <$> bs)
 
-transforms = [
-  id,
-  rotateX,
-  rotateX,
-  rotateX,
-  rotateY.rotateX,
-  rotateX,
-  rotateX,
-  rotateX,
-  rotateY.rotateX,
-  rotateX,
-  rotateX,
-  rotateX,
-  rotateY.rotateX,
-  rotateX,
-  rotateX,
-  rotateX,
-  rotateZ.rotateX,
-  rotateX,
-  rotateX,
-  rotateX,
-  rotateZ.rotateZ.rotateX,
-  rotateX,
-  rotateX,
-  rotateX
+transforms :: [Point -> Point]
+transforms =
+  [ id,
+    rotateX,
+    rotateX,
+    rotateX,
+    rotateY . rotateX,
+    rotateX,
+    rotateX,
+    rotateX,
+    rotateY . rotateX,
+    rotateX,
+    rotateX,
+    rotateX,
+    rotateY . rotateX,
+    rotateX,
+    rotateX,
+    rotateX,
+    rotateZ . rotateX,
+    rotateX,
+    rotateX,
+    rotateX,
+    rotateZ . rotateZ . rotateX,
+    rotateX,
+    rotateX,
+    rotateX
   ]
 
 pairWiseManhattan :: [Beacon] -> [(Int, Beacon, Beacon)]
@@ -167,41 +167,43 @@ pairWiseDeltas :: [Beacon] -> [(Vector, Beacon, Beacon)]
 pairWiseDeltas bs = allPairs bs |> fmap (\(b, b') -> (delta b b', b, b'))
 
 runSolution :: [Scanner] -> S.Set Beacon
-runSolution s = recur (head s)  (tail s)
+runSolution s = recur (head s) (tail s)
   where
-    recur :: Scanner ->  [Scanner] -> S.Set Beacon
+    recur :: Scanner -> [Scanner] -> S.Set Beacon
     recur unifiedScanner unlocated | null unlocated = unifiedScanner |> snd |> S.fromList
-    recur unifiedScanner unlocated = candidates unifiedScanner unlocated
-      |> \candidates -> case firstJust $ (\c -> matches transforms unifiedScanner c c)<$> candidates of
-        Nothing -> error "no solution"
-        Just (preTransform,scanner) -> trace ("resolved scanner " ++ show (length unlocated) ++ " left") $ recur (unifyScanner unifiedScanner scanner) (delete preTransform unlocated)
+    recur unifiedScanner unlocated =
+      candidates unifiedScanner unlocated
+        |> \cs -> case firstJust $ (\c -> matches transforms unifiedScanner c c) <$> cs of
+          Nothing -> error "no solution"
+          Just (preTransform, scanner) -> trace ("resolved scanner " ++ show (length unlocated) ++ " left") $ recur (unifyScanner unifiedScanner scanner) (delete preTransform unlocated)
 
 runSolution2 :: [Scanner] -> [Point]
-runSolution2 s = recur (head s)  (tail s) [(0,0,0)]
+runSolution2 s = recur (head s) (tail s) [(0, 0, 0)]
   where
-    recur :: Scanner ->  [Scanner] -> [Point] -> [Point]
-    recur unifiedScanner unlocated scanLocs | null unlocated = scanLocs
-    recur unifiedScanner unlocated scanLocs = candidates unifiedScanner unlocated
-      |> \candidates -> case firstJust $ (\c -> matches transforms unifiedScanner c c)<$> candidates of
-        Nothing -> error "no solution"
-        Just (preTransform,scanner) -> 
-          trace ("resolved scanner " ++ show (length unlocated) ++ " left") 
-          $ recur (unifyScanner unifiedScanner scanner) (delete preTransform unlocated) (fromJust (fst scanner): scanLocs)
+    recur :: Scanner -> [Scanner] -> [Point] -> [Point]
+    recur _unifiedScanner unlocated scanLocs | null unlocated = scanLocs
+    recur unifiedScanner unlocated scanLocs =
+      candidates unifiedScanner unlocated
+        |> \cs -> case firstJust $ (\c -> matches transforms unifiedScanner c c) <$> cs of
+          Nothing -> error "no solution"
+          Just (preTransform, scanner) ->
+            trace ("resolved scanner " ++ show (length unlocated) ++ " left") $
+              recur (unifyScanner unifiedScanner scanner) (delete preTransform unlocated) (fromJust (fst scanner) : scanLocs)
 
 firstJust :: [Maybe a] -> Maybe a
-firstJust (Just a:_) = Just a
+firstJust (Just a : _) = Just a
 firstJust [] = Nothing
-firstJust (Nothing:others) = firstJust others
+firstJust (Nothing : others) = firstJust others
 
 unifyScanner :: Scanner -> Scanner -> Scanner
-unifyScanner (Just (0,0,0), bs) other = (Just (0,0,0), bs `union` (adjustScanner other |> snd))
+unifyScanner (Just (0, 0, 0), bs) other = (Just (0, 0, 0), bs `union` (adjustScanner other |> snd))
 unifyScanner _ _ = error "unify unlocated scanner"
 
 -- 362
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
-    |> runSolution 
+    |> runSolution
     |> length
 
 --12204
