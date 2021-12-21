@@ -10,36 +10,37 @@ import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
 import Data.Bifunctor (bimap)
+import qualified Data.Map.Strict as M
 
 data GameState = GameState
-  { p1Pos :: [Int],
+  { p1Pos :: Int,
     p1Points :: Int,
-    p2Pos :: [Int],
+    p2Pos :: Int,
     p2Points :: Int,
     dice :: [Int],
     dieRolls :: Int,
     nextPlayer :: Player
   }
-  deriving (Eq)
+  deriving (Eq, Ord)
 
 instance Show GameState where
   show GameState {..} =
-    (show p1Points)
+    show p1Points
       ++ "/"
-      ++ (show p2Points)
-      ++ " ("
-      ++ (show (head p1Pos))
-      ++ ":"
-      ++ (show (head p2Pos))
-      ++ ")"
+      ++ show p2Points
+--      ++ " ("
+--      ++ show p1Pos
+--      ++ ":"
+--      ++ show p2Pos
+--      ++ ")"
 
-data Player = P1 | P2 deriving (Eq, Show)
+data Player = P1 | P2 deriving (Eq, Show, Ord)
 
 mkGame :: Int -> Int -> [Int] -> GameState
 mkGame s1 s2 d =
   GameState
-    { p1Pos = drop (s1 - 1) $ cycle [1 .. 10],
-      p2Pos = drop (s2 - 1) $ cycle [1 .. 10],
+    { p1Pos = s1,
+      p2Pos = s2,
       p1Points = 0,
       p2Points = 0,
       dice = d,
@@ -47,13 +48,16 @@ mkGame s1 s2 d =
       nextPlayer = P1
     }
 
+updatePos :: Int -> Int -> Int
+updatePos m p =  cycle [1..10] !! (m + p - 1)
+
 gameStep :: GameState -> GameState
 gameStep g =
   let g' = g {dice = drop 3 $ dice g, dieRolls = 3 + dieRolls g}
       moves = sum $ take 3 $ dice g
    in case nextPlayer g of
-        P1 -> g' {nextPlayer = P2, p1Pos = drop moves (p1Pos g), p1Points = p1Points g + (p1Pos g) !! moves}
-        P2 -> g' {nextPlayer = P1, p2Pos = drop moves (p2Pos g), p2Points = p2Points g + (p2Pos g) !! moves}
+        P1 -> g' {nextPlayer = P2, p1Pos = updatePos moves (p1Pos g), p1Points = p1Points g + updatePos moves (p1Pos g)}
+        P2 -> g' {nextPlayer = P1, p2Pos = updatePos moves (p2Pos g), p2Points = p2Points g + updatePos moves (p2Pos g)}
 
 isWon :: GameState -> Bool
 isWon GameState {p1Points} | p1Points >= 1000 = True
@@ -78,17 +82,34 @@ inputParser = undefined
 playDirac :: [GameState] -> [GameState]
 playDirac gs = fmap diracStep gs
   |> mconcat
-  |> \gs' -> if length gs' == length gs 
+  |> \gs' -> if length gs' == length gs
              then gs'
              else playDirac gs'
+
+playDiracMap :: M.Map GameState Int -> M.Map GameState Int
+playDiracMap gmap = M.foldlWithKey f gmap gmap
+  where f :: M.Map GameState Int -> GameState -> Int -> M.Map GameState Int
+        f acc g _c | isEnd g = acc
+        f acc g c = diracStep g |> foldl (fi c) (M.delete g acc)
+        fi :: Int ->  M.Map GameState Int -> GameState -> M.Map GameState Int
+        fi gc acc g = M.insertWith (+) g gc acc
+
+playDiracMapTilStable :: Int -> M.Map GameState Int -> M.Map GameState Int
+playDiracMapTilStable 0 _ = error "no stability reached"
+playDiracMapTilStable n g = let g' = playDiracMap g in if g == g' then g else playDiracMapTilStable (n - 1) g'
 
 splitP :: (a -> Bool) -> [a] -> ([a], [a]) -> ([a], [a])
 splitP _p [] r = r
 splitP p (a:as) (n, y) = if p a then splitP p as (n, a:y) else splitP p as (a:n, y)
 
+byWinningsM :: M.Map GameState Int -> (Int, Int)
+byWinningsM = M.foldlWithKey f (0,0)
+  where f :: (Int, Int) -> GameState -> Int -> (Int, Int)
+        f (p1, p2) g c = if p1Points g > p2Points g then (p1 + c,p2) else (p1, p2 + c)
+
 byWinnings :: [GameState] -> (Int, Int)
 byWinnings g = splitP (\g -> p1Points g > p2Points g) g ([],[])
- |> (bimap length length)
+ |> bimap length length
 
 diracStep :: GameState -> [GameState]
 diracStep g | isEnd g = [g]
@@ -136,7 +157,7 @@ maxPair (x,y) | x> y = x
 maxPair (_,y) = y
 
 solution2 :: Input -> Int
-solution2 _input = mkGame 4 10 [] |> (:[]) |> playDirac |> byWinnings |> maxPair
+solution2 _input = mkGame 4 10 [] |> (`M.singleton` 1) |> playDiracMapTilStable 20 |> byWinningsM |> maxPair
   --parseOrDie inputParser input
     -- |> error "not yet"
 
