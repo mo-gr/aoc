@@ -27,6 +27,9 @@ import qualified Y2021.AOC19
 import qualified Y2021.AOC20
 import qualified Y2021.AOC21
 import qualified Y2021.AOC22
+import qualified Y2021.AOC23
+import qualified Y2021.AOC24
+import qualified Y2021.AOC25
 
 year :: Year
 year = mkYear "2021" solution verify
@@ -54,7 +57,9 @@ solution D19 = run Y2021.AOC19.solution1 Y2021.AOC19.solution2 $ loadInput "AOC1
 solution D20 = run Y2021.AOC20.solution1 Y2021.AOC20.solution2 $ loadInput "AOC20"
 solution D21 = run Y2021.AOC21.solution1 Y2021.AOC21.solution2 $ loadInput "AOC21"
 solution D22 = run Y2021.AOC22.solution1 Y2021.AOC22.solution2 $ loadInput "AOC22"
-solution _ = error "not yet"
+solution D23 = run Y2021.AOC23.solution1 Y2021.AOC23.solution2 $ loadInput "AOC23"
+solution D24 = run Y2021.AOC24.solution1 Y2021.AOC24.solution2 $ loadInput "AOC24"
+solution D25 = run Y2021.AOC25.solution1 Y2021.AOC25.solution2 $ loadInput "AOC25"
 
 loadInput :: String -> IO Input
 loadInput d = C.readFile $ d ++ ".input"
@@ -86,7 +91,10 @@ verify =
       TestLabel "Day 19" $ Y2021.AOC19.verify (loadInput "AOC19"),
       TestLabel "Day 20" $ Y2021.AOC20.verify (loadInput "AOC20"),
       TestLabel "Day 21" $ Y2021.AOC21.verify (loadInput "AOC21"),
-      TestLabel "Day 22" $ Y2021.AOC22.verify (loadInput "AOC22")
+      TestLabel "Day 22" $ Y2021.AOC22.verify (loadInput "AOC22"),
+      TestLabel "Day 23" $ Y2021.AOC23.verify (loadInput "AOC23"),
+      TestLabel "Day 24" $ Y2021.AOC24.verify (loadInput "AOC24"),
+      TestLabel "Day 25" $ Y2021.AOC25.verify (loadInput "AOC25")
     ]
 
 inRepl1 :: Day -> IO String
