@@ -55,6 +55,14 @@ isPossible m _ _ t | M.member t m = False -- can only go to free fields
 isPossible m (xf, 2) _ _to | M.member (xf, 1) m = False -- Can only leave room if no one is in the way
 isPossible _m (_, 2) _ (_, 1) = False -- has to leave the room
 isPossible m fr@(xf, _) _ (xt, _) | any (\x -> M.member (x, 0) (M.delete fr m)) [(min xf xt) .. (max xf xt)] = False -- path has to be free
+isPossible m _ Amber (_, 0) | M.notMember (2,2) m = False -- Amber has to go home directly if possible
+isPossible m _ Amber (_, 0) | M.notMember (2,1) m && M.lookup (2, 2) m == Just Amber = False -- Amber has to go home directly if possible
+isPossible m _ Bronze (_, 0) | M.notMember (4,2) m = False -- Bronze has to go home directly if possible
+isPossible m _ Bronze (_, 0) | M.notMember (4,1) m && M.lookup (4, 2) m == Just Bronze = False -- Bronze has to go home directly if possible
+isPossible m _ Copper (_, 0) | M.notMember (6,2) m = False -- Copper has to go home directly if possible
+isPossible m _ Copper (_, 0) | M.notMember (6,1) m && M.lookup (6, 2) m == Just Copper = False -- Copper has to go home directly if possible
+isPossible m _ Desert (_, 0) | M.notMember (8,2) m = False -- Desert has to go home directly if possible
+isPossible m _ Desert (_, 0) | M.notMember (8,1) m && M.lookup (8, 2) m == Just Desert = False -- Desert has to go home directly if possible
 isPossible _ _ _ _ = True
 
 type World = (Int, M.Map Point Pod)
@@ -67,6 +75,7 @@ updateKey k k1 m = case M.lookup k m of
 move :: World -> (Point, Pod) -> Maybe [World]
 move (en, wo) (fr, po) = case filter (isPossible wo fr po) validTargets of
   [] -> Nothing
+--  moves -> trace (show fr ++ show po ++ " " ++ show moves ++ "\n" ++ pretty (en, wo)) $ Just $ do
   moves -> Just $ do
     m <- moves
     pure (en + cost fr po m, updateKey fr m wo)
@@ -90,13 +99,14 @@ sieve pre aa' = recur aa' ([], [])
         recur (a:aa) (p, notP) = recur aa $ if pre a then (a:p, notP) else (p, a:notP)
 
 solve :: Int ->  World -> [World]
-solve o w =
+solve cutOff w =
   let pods :: [(Point, Pod)]
       pods = M.assocs . snd $ w
       newWorlds = dropDeadEnds (move w <$> pods)
       (win, open) = sieve ((== winState).snd) newWorlds
-      remaining = o + length open
-  in if null open then win else win ++ (mconcat $ solve remaining <$> open)
+      newCutOff = if null win then cutOff else traceShowId $ min cutOff (fmap fst win |> minimum)
+      openCandidates = filter (\(e,_) -> e < newCutOff) open
+  in if null open then win else win ++ mconcat (solve newCutOff <$> openCandidates)
 
 evolveAllUntilWin :: World -> [World]
 evolveAllUntilWin (e, w) | w == winState = [(e, w)]
@@ -150,18 +160,6 @@ inputState =
 data Pod = Amber | Bronze | Copper | Desert
   deriving (Show, Eq, Ord)
 
-data Burrow = Burow
-  { roomA :: [Pod],
-    roomB :: [Pod],
-    roomC :: [Pod],
-    roomD :: [Pod],
-    leftHall :: [Pod],
-    hall1 :: [Pod],
-    hall2 :: [Pod],
-    hall3 :: [Pod],
-    rightHall :: [Pod]
-  }
-
 cost :: Point -> Pod -> Point -> Int
 cost (xf, yf) p (xt, yt) | yf /= 0 && yt /= 0 && xf /= xt = cost (xf,yf) p (xf, 0) + cost (xf, 0) p (xt, yt)
 cost fr p to = manhattanDistance fr to * energy p
@@ -181,9 +179,44 @@ energy Desert = 1000
 inputParser :: Parser [String]
 inputParser = undefined
 
+pretty :: World -> String
+pretty (_e,w) = (do
+           x <- [0 .. 11]
+           printPod (x,0))
+             ++ "\n"
+             ++ "  "
+             ++ printPod (2,1)
+             ++ " "
+             ++ printPod (4,1)
+             ++ " "
+             ++ printPod (6,1)
+             ++ " "
+             ++ printPod (8,1)
+             ++ "\n"
+             ++ "  "
+             ++ printPod (2,2)
+             ++ " "
+             ++ printPod (4,2)
+             ++ " "
+             ++ printPod (6,2)
+             ++ " "
+             ++ printPod (8,2)
+             ++ "\n"
+  where printPod pos = case M.lookup pos w of
+                                Nothing -> "."
+                                Just Amber -> "A"
+                                Just Bronze -> "B"
+                                Just Copper -> "C"
+                                Just Desert -> "D"
+
+-- not 25497 too high
+-- not 16557 too high
+-- not 16517 too high
+-- not 16491
 solution1 :: Input -> Int
 solution1 _input =
-  solve 0 inputWorld
+  solve 16517 inputWorld
+--  solve 16517 demoWorld
     |> fmap fst
     |> minimum
 
