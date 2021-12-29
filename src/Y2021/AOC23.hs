@@ -98,15 +98,13 @@ sieve pre aa' = recur aa' ([], [])
   where recur [] acc = acc
         recur (a:aa) (p, notP) = recur aa $ if pre a then (a:p, notP) else (p, a:notP)
 
-solve :: Int ->  World -> [World]
-solve cutOff w =
+solve ::  World -> [World]
+solve w =
   let pods :: [(Point, Pod)]
       pods = M.assocs . snd $ w
       newWorlds = dropDeadEnds (move w <$> pods)
       (win, open) = sieve ((== winState).snd) newWorlds
-      newCutOff = if null win then cutOff else traceShowId $ min cutOff (fmap fst win |> minimum)
-      openCandidates = filter (\(e,_) -> e < newCutOff) open
-  in if null open then win else win ++ mconcat (solve newCutOff <$> openCandidates)
+  in if null open then win else win ++ mconcat (solve <$> open)
 
 evolveAllUntilWin :: World -> [World]
 evolveAllUntilWin (e, w) | w == winState = [(e, w)]
@@ -215,7 +213,7 @@ pretty (_e,w) = (do
 -- not 16491
 solution1 :: Input -> Int
 solution1 _input =
-  solve 16517 inputWorld
+  solve inputWorld
 --  solve 16517 demoWorld
     |> fmap fst
     |> minimum
