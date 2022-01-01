@@ -14,7 +14,7 @@ basePattern :: [Int]
 basePattern = [0, 1, 0 , -1]
 
 phasePatternN :: Int -> [Int]
-phasePatternN n = tail . cycle . mconcat $ (\p -> replicate n p) <$> basePattern
+phasePatternN n = tail . cycle . mconcat $ replicate n <$> basePattern
 
 nth :: Int -> [a] -> a
 nth 0 as     = head as
@@ -22,7 +22,7 @@ nth x (_:as) = nth (x-1) as
 nth _ _      = error "invalid index access"
 
 phase :: [Int] -> [Int]
-phase xs = let ph p = flip mod 10 . abs . sum $ zipWith (\n s -> s * (nth n $ phasePatternN p)) [0..] xs in
+phase xs = let ph p = flip mod 10 . abs . sum $ zipWith (\n s -> s * nth n (phasePatternN p)) [0..] xs in
     zipWith (\n _ -> ph n) [1..] xs
 
 phases :: Int -> [Int] -> [Int]
@@ -30,16 +30,16 @@ phases 0 xs = xs
 phases n xs = phases (n-1) $ phase xs
 
 charToNum :: Enum a => a -> Int
-charToNum a = fromEnum a - (fromEnum '1') + 1
+charToNum a = fromEnum a - fromEnum '1' + 1
 
 _example :: [Int]
 _example = charToNum <$> "12345678"
 
-_long_example :: [Int]
-_long_example = charToNum <$> "80871224585914546619083218645595"
+_longExample :: [Int]
+_longExample = charToNum <$> "80871224585914546619083218645595"
 
 format :: [Int] -> [Char]
-format xs = toEnum . pred . (+ (fromEnum '1')) <$> take 8 xs
+format xs = toEnum . pred . (+ fromEnum '1') <$> take 8 xs
 
 offset :: [a] -> [a]
 offset = drop 5976809

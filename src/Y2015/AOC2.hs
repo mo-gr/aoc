@@ -34,7 +34,9 @@ bow :: Box -> Int
 bow (l, w, h) = l * w * h
 
 wrap :: Box -> Int
-wrap (l, w, h) = let [a, b, _] = sort [l, w, h] in a + a + b + b
+wrap (l, w, h) = case sort [l, w, h] of
+  [a, b, _] -> a + a + b + b
+  _ -> error "something went wrong"
 
 ribbon :: Box -> Int
 ribbon box = bow box + wrap box

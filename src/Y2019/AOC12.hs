@@ -32,8 +32,8 @@ callisto = makeMoon "callisto" $ Vec3 0 (-2) (-2)
 universe :: [Moon]
 universe = [io, europa, ganymede, callisto]
 
-_sample_universe :: [Moon]
-_sample_universe =
+_sampleUniverse :: [Moon]
+_sampleUniverse =
     [ makeMoon "m1" (Vec3 (-1) 0 2)
     , makeMoon "m2" (Vec3 2 (-10) (-7))
     , makeMoon "m3" (Vec3 4 (-8) 8)
@@ -82,8 +82,7 @@ applyVelocity m@Moon { velocity = Velocity vVec, position = Position pVec } =
     m { position = Position (vVec `plus` pVec) }
 
 applyGravity :: [Moon] -> Moon -> Moon
-applyGravity []           m = m
-applyGravity (other : ms) m = applyGravity ms (m `gravityPull` other)
+applyGravity ms m = foldl gravityPull m ms
 
 tick :: [Moon] -> [Moon]
 tick ms = applyVelocity . applyGravity ms <$> ms
@@ -111,8 +110,7 @@ oneDimensionEq Z Moon { velocity = Velocity Vec3 { _z = vz }, position = Positio
     = pz == pz' && vz == vz'
 
 lcm' :: Integral a => [a] -> a
-lcm' []       = 1
-lcm' (a : as) = lcm a (lcm' as)
+lcm' = foldr lcm 1
 
 -- 354540398381256
 solution2 :: IO ()
@@ -128,12 +126,12 @@ solution2 = do
 
 prop_step_0 :: H.Property
 prop_step_0 = H.withTests 1 $ H.property $ do
-    let step0 = times 0 tick _sample_universe
-    step0 H.=== _sample_universe
+    let step0 = times 0 tick _sampleUniverse
+    step0 H.=== _sampleUniverse
 
 prop_step_1 :: H.Property
 prop_step_1 = H.withTests 1 $ H.property $ do
-    let step0 = times 1 tick _sample_universe
+    let step0 = times 1 tick _sampleUniverse
     step0
         H.=== [ Moon { name     = "m1"
                      , position = Position (Vec3 { _x = 2, _y = -1, _z = 1 })
@@ -155,32 +153,32 @@ prop_step_1 = H.withTests 1 $ H.property $ do
 
 prop_velocity :: H.Property
 prop_velocity = H.withTests 1 $ H.property $ do
-    let m  = head _sample_universe
-    let m' = applyGravity _sample_universe m
+    let m  = head _sampleUniverse
+    let m' = applyGravity _sampleUniverse m
     velocity m' H.=== Velocity (Vec3 { _x = 3, _y = -1, _z = -1 })
 
 prop_velocity_simple :: H.Property
 prop_velocity_simple = H.withTests 1 $ H.property $ do
-    let m  = head _sample_universe
+    let m  = head _sampleUniverse
     let m' = applyGravity [m] m
     velocity m' H.=== Velocity (Vec3 { _x = 0, _y = 0, _z = 0 })
 
 prop_velocity_one :: H.Property
 prop_velocity_one = H.withTests 1 $ H.property $ do
-    let m  = head _sample_universe
-    let m' = applyGravity (take 2 _sample_universe) m
+    let m  = head _sampleUniverse
+    let m' = applyGravity (take 2 _sampleUniverse) m
     velocity m' H.=== Velocity (Vec3 { _x = 1, _y = -1, _z = -1 })
 
 prop_gravity_neutral :: H.Property
 prop_gravity_neutral = H.withTests 1 $ H.property $ do
-    let m = head _sample_universe
+    let m = head _sampleUniverse
     velocity (m `gravityPull` m)
         H.=== Velocity (Vec3 { _x = 0, _y = 0, _z = 0 })
 
 prop_gravity_pull :: H.Property
 prop_gravity_pull = H.withTests 1 $ H.property $ do
-    let m  = head _sample_universe
-    let m' = head (tail _sample_universe)
+    let m  = head _sampleUniverse
+    let m' = head (tail _sampleUniverse)
     velocity (m `gravityPull` m')
         H.=== Velocity (Vec3 { _x = 1, _y = -1, _z = -1 })
 

@@ -7,7 +7,7 @@ module Y2019.AOC13
 where
 
 import           Control.Concurrent         (threadDelay)
-import           Control.Monad              (when)
+import           Control.Monad              (when, void)
 import           Control.Monad.State.Strict (StateT, execStateT, gets, modify,
                                              modify')
 import           Control.Monad.Trans        (lift)
@@ -74,7 +74,7 @@ solution1 = do
     let machine = buildMachine <$> ops
     case machine of
         Left  e -> error (show e)
-        Right m -> return . countBlocks . output =<< execState runUntilHalt m
+        Right m -> countBlocks . output <$> execState runUntilHalt m
 
 solution2 :: IO ()
 solution2 = do
@@ -85,7 +85,7 @@ solution2 = do
         Left  e -> error (show e)
         Right m -> do
             let m' = m { memory = Map.insert 0 2 $ memory m, input = [0] }
-            execState runUntilHaltIO m' >> return ()
+            void (execState runUntilHaltIO m')
 
 getTilePrint :: Int -> String
 getTilePrint 0 = " "
@@ -196,7 +196,7 @@ runUntilHaltIO = do
             when (length output' >= 3) $ do
                 lift $ printScreen (take 3 output')
                 modify (\s -> s { output = drop 3 output' })
-                when (length output' < 10) $ lift $ threadDelay $ 500
+                when (length output' < 10) $ lift $ threadDelay 500
             case output' of
                 (x : _y : 4 : _) -> modify (\s -> s { ballX = x })
                 (x : _y : 3 : _) -> modify (\s -> s { paddleX = x })

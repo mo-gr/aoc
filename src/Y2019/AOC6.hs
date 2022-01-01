@@ -14,7 +14,7 @@ import           Text.Parsec            (alphaNum, many1, parse, skipMany,
                                          space, string)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
 
-data Planet = Planet { name :: String } deriving (Eq, Show, Ord)
+newtype Planet = Planet {name :: String} deriving (Eq, Show, Ord)
 data Orbit = Orbit { center :: Planet, outer :: Planet } deriving (Eq, Show)
 type WeightedOrbit = (Orbit, Int)
 
@@ -109,7 +109,7 @@ prop_transfer =
       santa = Planet "SAN"
   in  H.withTests 1
         $ H.property
-        $ case parse inputParser "example_transfer" transfer_example of
+        $ case parse inputParser "example_transfer" transferExample of
             Right x ->
               transferCount (map (calculateDistanceToCom x) x) you santa H.=== 4
             Left e -> H.footnote (show e) >> H.failure
@@ -119,7 +119,7 @@ prop_parents =
   let you = Planet "YOU"
   in  H.withTests 1
         $ H.property
-        $ case parse inputParser "example_transfer" transfer_example of
+        $ case parse inputParser "example_transfer" transferExample of
             Right x ->
               (   name
                 <$> allParents (fst <$> map (calculateDistanceToCom x) x) you
@@ -130,8 +130,8 @@ prop_parents =
 example :: ByteString
 example = "COM)B B)C C)D D)E E)F B)G G)H D)I E)J J)K K)L"
 
-transfer_example :: ByteString
-transfer_example = "COM)B B)C C)D D)E E)F B)G G)H D)I E)J J)K K)L K)YOU I)SAN"
+transferExample :: ByteString
+transferExample = "COM)B B)C C)D D)E E)F B)G G)H D)I E)J J)K K)L K)YOU I)SAN"
 
 _tests :: IO Bool
 _tests = H.checkParallel $ H.Group

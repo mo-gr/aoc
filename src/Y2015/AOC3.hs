@@ -5,6 +5,7 @@ import Data.List (nub)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, (<|>))
 import Text.Parsec.ByteString (Parser, parseFromFile)
+import Data.Functor (($>))
 
 data Direction = North | South | East | West deriving (Show, Eq)
 
@@ -12,10 +13,10 @@ type Location = (Int, Int)
 
 directionParser :: Parser Direction
 directionParser = do
-  char '>' *> pure East
-    <|> char '<' *> pure West
-    <|> char '^' *> pure North
-    <|> char 'v' *> pure South
+  char '>' $> East
+    <|> char '<' $> West
+    <|> char '^' $> North
+    <|> char 'v' $> South
 
 inputParser :: Parser [Direction]
 inputParser = many1 directionParser

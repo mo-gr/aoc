@@ -2,12 +2,21 @@
 
 module Y2020.AOC16 where
 
-import           Data.Either            (fromRight)
-import qualified Data.Map.Strict        as M
-import           Text.Parsec            (char, endOfLine, letter, many1, sepBy1,
-                                         space, string, (<|>))
-import           Text.Parsec.ByteString (Parser, parseFromFile)
-import           Util                   (number)
+import Data.Bifunctor (second)
+import Data.Either (fromRight)
+import qualified Data.Map.Strict as M
+import Text.Parsec
+  ( char,
+    endOfLine,
+    letter,
+    many1,
+    sepBy1,
+    space,
+    string,
+    (<|>),
+  )
+import Text.Parsec.ByteString (Parser, parseFromFile)
+import Util (number)
 
 ruleParser :: Parser Rule
 ruleParser = do
@@ -18,7 +27,7 @@ ruleParser = do
   h1 <- number <* string " or "
   l2 <- number <* char '-'
   h2 <- number
-  return $ Rule {fieldName=fn':fn, validRange=[l1..h1] ++ [l2..h2]}
+  return $ Rule {fieldName = fn' : fn, validRange = [l1 .. h1] ++ [l2 .. h2]}
 
 ticketParser :: Parser Ticket
 ticketParser = do
@@ -34,30 +43,33 @@ inputParser = do
   otherTickets <- string "nearby tickets:" *> endOfLine *> many1 (ticketParser <* endOfLine)
   return (rules, myTicket, otherTickets)
 
-data Rule = Rule {
-  fieldName  :: String,
-  validRange :: [Int]
-} deriving (Show)
+data Rule = Rule
+  { fieldName :: String,
+    validRange :: [Int]
+  }
+  deriving (Show)
 
-data Ticket = Ticket {
-  fieldValues :: [Int]
-} deriving (Show)
+newtype Ticket = Ticket {fieldValues :: [Int]}
+  deriving (Show)
 
 type InputState = ([Rule], Ticket, [Ticket])
 
 invalidFields :: InputState -> [Int]
 invalidFields (rules, _myTicket, tickets) = filter (invalid rules) $ concat (fieldValues <$> tickets)
-    where invalid :: [Rule] -> Int -> Bool
-          invalid rs field = all (\r -> field `notElem` r) (validRange <$> rs)
+  where
+    invalid :: [Rule] -> Int -> Bool
+    invalid rs field = all (\r -> field `notElem` r) (validRange <$> rs)
 
 discardInvalidTickets :: InputState -> [Ticket]
 discardInvalidTickets (rules, _myTicket, tickets) = filter (valid rules) tickets
-    where valid :: [Rule] -> Ticket -> Bool
-          valid rs Ticket {fieldValues} = let ranges = validRange <$> rs in
-                                          all (\field -> field `elem` concat ranges) fieldValues
+  where
+    valid :: [Rule] -> Ticket -> Bool
+    valid rs Ticket {fieldValues} =
+      let ranges = validRange <$> rs
+       in all (\field -> field `elem` concat ranges) fieldValues
 
 fieldCandidates :: Rule -> [Ticket] -> [Int]
-fieldCandidates Rule {validRange} tickets = filter (\idx -> all (\Ticket{fieldValues} -> (fieldValues !! idx) `elem` validRange) tickets) [0..(length $ fieldValues (head tickets)) - 1]
+fieldCandidates Rule {validRange} tickets = filter (\idx -> all (\Ticket {fieldValues} -> (fieldValues !! idx) `elem` validRange) tickets) [0 .. length (fieldValues (head tickets)) - 1]
 
 -- 22057
 solution1 :: IO Int
@@ -69,21 +81,22 @@ solution1 = do
 solution2 :: IO Int
 solution2 = do
   state@(rules, myTicket, _tickets) <- fromRight undefined <$> parseFromFile inputParser "AOC16.input"
-  let candidates = M.fromList $ (\r@Rule{fieldName} -> (fieldName, fieldCandidates r (myTicket:discardInvalidTickets state))) <$> rules
+  let candidates = M.fromList $ (\r@Rule {fieldName} -> (fieldName, fieldCandidates r (myTicket : discardInvalidTickets state))) <$> rules
   let resolved = resolve candidates M.empty
-  let Ticket{fieldValues=myFields} = myTicket
-  return $ (myFields !! (resolved M.! "departure location"))
-         * (myFields !! (resolved M.! "departure station"))
-         * (myFields !! (resolved M.! "departure platform"))
-         * (myFields !! (resolved M.! "departure track"))
-         * (myFields !! (resolved M.! "departure date"))
-         * (myFields !! (resolved M.! "departure time"))
-
+  let Ticket {fieldValues = myFields} = myTicket
+  return $
+    (myFields !! (resolved M.! "departure location"))
+      * (myFields !! (resolved M.! "departure station"))
+      * (myFields !! (resolved M.! "departure platform"))
+      * (myFields !! (resolved M.! "departure track"))
+      * (myFields !! (resolved M.! "departure date"))
+      * (myFields !! (resolved M.! "departure time"))
 
 resolve :: M.Map String [Int] -> M.Map String Int -> M.Map String Int
 resolve candidates known | M.empty == candidates = known
 resolve candidates known = case M.assocs $ M.filter (\xs -> length xs == 1) candidates of
-   [(field, [entry])] -> resolve (updateCandidates (M.delete field candidates) entry) (M.insert field entry known)
-   _ -> error "something went wrong"
-  where updateCandidates :: M.Map String [Int] -> Int -> M.Map String [Int]
-        updateCandidates m x = M.fromList $ (\(f, xs) -> (f, filter (/= x) xs)) <$> M.toList m
+  [(field, [entry])] -> resolve (updateCandidates (M.delete field candidates) entry) (M.insert field entry known)
+  _ -> error "something went wrong"
+  where
+    updateCandidates :: M.Map String [Int] -> Int -> M.Map String [Int]
+    updateCandidates m x = M.fromList $ second (filter (/= x)) <$> M.toList m

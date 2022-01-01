@@ -72,4 +72,3 @@ mkYear y s v =
       showYear = y,
       verify = v
     }
-
