@@ -1,0 +1,1 @@
+:def pf \str -> return $ ":! pointfree \"" ++ str ++ "\""

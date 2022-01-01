@@ -1,70 +1,85 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Y2019.AOC14
-    ( solution1
-    , solution2
-    )
+  ( solution1,
+    solution2,
+  )
 where
-  
-import           Text.Parsec.ByteString     (Parser, parseFromFile)
-import           Text.Parsec                (digit, many1, sepBy, string, (<|>), letter, newline)
+
+import qualified Data.Map as M
+import Text.Parsec (letter, many1, newline, sepBy, string)
+import Text.Parsec.ByteString (Parser, parseFromFile)
 import Util (number)
 
-newtype Count = Count Int deriving (Eq, Show, Num)
+type Count = Int
 
-newtype Chemical = 
-    Chemical {
-        chemicalName :: String
-    } deriving (Show, Eq)
-  
-data Reaction = Reaction {
-    input :: [(Count, Chemical)],
+newtype Chemical = Chemical
+  { chemicalName :: String
+  }
+  deriving (Show, Eq, Ord)
+
+data Reaction = Reaction
+  { input :: [(Count, Chemical)],
     output :: (Count, Chemical)
-} deriving (Show)
+  }
+  deriving (Show)
 
 reactionParser :: Parser Reaction
-reactionParser = do 
-    input' <- sepBy ((,) <$> countParser <* string " " <*> chemicalParser) (string ", ")
-    _ <- string " => "
-    output' <- (,) <$> countParser <* string " " <*> chemicalParser
-    return $ Reaction input' output'
-    where countParser :: Parser Count
-          countParser = Count <$> number
-          chemicalParser :: Parser Chemical
-          chemicalParser = Chemical <$> many1 letter
-
-solution1 :: IO ()
-solution1 = do
-  ops <- parseFromFile (reactionParser `sepBy` newline) "data/example.input"
-  print ops
-
-solution2 :: IO ()
-solution2 = error "no solution yet"
+reactionParser = do
+  input' <- sepBy ((,) <$> countParser <* string " " <*> chemicalParser) (string ", ")
+  _ <- string " => "
+  output' <- (,) <$> countParser <* string " " <*> chemicalParser
+  return $ Reaction input' output'
+  where
+    countParser :: Parser Count
+    countParser = number
+    chemicalParser :: Parser Chemical
+    chemicalParser = Chemical <$> many1 letter
 
 findReaction :: [Reaction] -> Chemical -> Reaction
 findReaction [] _ = error "no reaction found"
-findReaction (r:rs) c | snd (output r) == c = r
-                      | otherwise = findReaction rs c
+findReaction (r : rs) c
+  | snd (output r) == c = r
+  | otherwise = findReaction rs c
 
-findCost :: [Reaction] -> Chemical -> ([(Count, Chemical)], Count)
-findCost ops chem = (input $ findReaction ops chem, fst . output $ findReaction ops chem)
+fuelBom :: [Reaction] -> M.Map Chemical Count -> M.Map Chemical Count
+fuelBom _rs bom | onlyOre bom = bom
+fuelBom rs bom =
+  let (chem, cnt) = head $ filter positiveBom $ filter notOre $ M.assocs bom
+      Reaction {input, output} = findReaction rs chem
+      yield = fst output
+      times = if yield >= cnt then 1 else (cnt `div` yield) + (if cnt `mod` yield == 0 then 0 else 1)
+   in fuelBom rs $ M.adjust (\c -> c - (times * yield)) chem $ foldl (\acc (cnt', chem') -> M.insertWith (+) chem' (times * cnt') acc) bom input
 
-findOreCost :: [Reaction] -> Chemical -> Count
-findOreCost ops chem =
-    let cost = findCost ops chem
-        oreCost = countOreAndRecurse cost
-        countOreAndRecurse :: ([(Count, Chemical)], Count) -> Count
-        countOreAndRecurse ([], _) = Count 0
-        countOreAndRecurse ((c, Chemical "ORE"):cs, unit) = c + countOreAndRecurse (cs, unit)
-        countOreAndRecurse ((c, chem'):cs, unit) = countOreAndRecurse (cs, unit) + (c * findOreCost ops chem')
-    in oreCost
+notOre :: (Chemical, b) -> Bool
+notOre = (/= Chemical "ORE") . fst
 
-testData :: [Reaction]
-testData = [
-  Reaction {input = [(Count 10,Chemical {chemicalName = "ORE"})], output = (Count 10,Chemical {chemicalName = "A"})},
-  Reaction {input = [(Count 1,Chemical {chemicalName = "ORE"})], output = (Count 1,Chemical {chemicalName = "B"})},
-  Reaction {input = [(Count 7,Chemical {chemicalName = "A"}),(Count 1,Chemical {chemicalName = "B"})], output = (Count 1,Chemical {chemicalName = "C"})},
-  Reaction {input = [(Count 7,Chemical {chemicalName = "A"}),(Count 1,Chemical {chemicalName = "C"})], output = (Count 1,Chemical {chemicalName = "D"})},
-  Reaction {input = [(Count 7,Chemical {chemicalName = "A"}),(Count 1,Chemical {chemicalName = "D"})], output = (Count 1,Chemical {chemicalName = "E"})},
-  Reaction {input = [(Count 7,Chemical {chemicalName = "A"}),(Count 1,Chemical {chemicalName = "E"})], output = (Count 1,Chemical {chemicalName = "FUEL"})}
-  ]
+positiveBom :: (Chemical, Count) -> Bool
+positiveBom = (> 0) . snd
+
+onlyOre :: M.Map Chemical Count -> Bool
+onlyOre bom = all oreOrNeg $ M.assocs bom
+  where
+    oreOrNeg (Chemical "ORE", _) = True
+    oreOrNeg (_, x) | x <= 0 = True
+    oreOrNeg _ = False
+
+-- 374457
+solution1 :: IO ()
+solution1 = do
+  Right ops <- parseFromFile (reactionParser `sepBy` newline) "AOC14.input"
+  print $ M.lookup (Chemical "ORE") $ fuelBom ops $ M.singleton (Chemical "FUEL") 1
+
+oreInput :: Int
+oreInput = 1000000000000
+
+maxFuel :: [Reaction] -> Int -> Int
+maxFuel ops fuel = case M.lookup (Chemical "ORE") $ fuelBom ops $ M.singleton (Chemical "FUEL") fuel of
+  Nothing -> error "something went wrong"
+  Just oreCost -> if oreCost > oreInput then fuel - 1 else maxFuel ops (fuel + 1)
+
+-- 3568888
+solution2 :: IO ()
+solution2 = do
+  Right ops <- parseFromFile (reactionParser `sepBy` newline) "AOC14.input"
+  print $ maxFuel ops 3560000 -- determined by manual binary search
