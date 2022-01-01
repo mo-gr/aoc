@@ -11,6 +11,7 @@ dependencies:
 - bytestring
 - ansi-terminal
 - directory
+- logict
 - HUnit
 executables:
   AOC:
