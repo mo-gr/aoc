@@ -10,6 +10,7 @@ import qualified Data.Map as M
 import Text.Parsec (letter, many1, newline, sepBy, string)
 import Text.Parsec.ByteString (Parser, parseFromFile)
 import Util (number)
+import Control.Monad (liftM2)
 
 type Count = Int
 
@@ -45,7 +46,7 @@ findReaction (r : rs) c
 fuelBom :: [Reaction] -> M.Map Chemical Count -> M.Map Chemical Count
 fuelBom _rs bom | onlyOre bom = bom
 fuelBom rs bom =
-  let (chem, cnt) = head $ filter positiveBom $ filter notOre $ M.assocs bom
+  let (chem, cnt) = head $ filter (liftM2 (&&) positiveBom notOre) $ M.assocs bom
       Reaction {input, output} = findReaction rs chem
       yield = fst output
       times = if yield >= cnt then 1 else (cnt `div` yield) + (if cnt `mod` yield == 0 then 0 else 1)
