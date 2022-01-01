@@ -32,7 +32,7 @@ main = do
   let maybeDay = case arg of
         (_ : d : _) -> day d
         _ -> Nothing
-  putStrLn $ "Advent of Code " ++ showYear year ++ " - Day " ++ fromMaybe "" (safeHead arg)
+  putStrLn $ "Advent of Code " ++ showYear year ++ " - Day " ++ fromMaybe "" (safeHead . tail $ arg)
   putStrLn $ "https://adventofcode.com/" ++ showYear year
   dataDir <- getDataDir
   setCurrentDirectory $ dataDir ++ inputDir year
