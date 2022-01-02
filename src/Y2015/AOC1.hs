@@ -1,9 +1,9 @@
 module Y2015.AOC1 where
 
-import Data.Either (fromRight)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, string, (<|>))
-import Text.Parsec.ByteString (Parser, parseFromFile)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, parseOrDie, (|>))
 
 data Command = Up | Down
 
@@ -32,20 +32,20 @@ executeTilBasement cs = snd' $ foldl f (0, 0, NotYet) cs
     snd' (_, b, _) = b
 
 -- 280
-solution1 :: IO Int
-solution1 = do
-  commands <- fromRight [] <$> parseFromFile inputParser "AOC1.input"
-  return $ execute commands
+solution1 :: Input -> Int
+solution1 input =
+  parseOrDie inputParser input
+    |> execute
 
 -- 1797
-solution2 :: IO Int
-solution2 = do
-  commands <- fromRight [] <$> parseFromFile inputParser "AOC1.input"
-  return $ executeTilBasement commands
+solution2 :: Input -> Int
+solution2 input =
+  parseOrDie inputParser input
+    |> executeTilBasement
 
-verify :: Test
-verify =
+verify :: IO Input -> Test
+verify input =
   TestList
-    [ TestCase (solution1 >>= assertEqual "solution 1" 280),
-      TestCase (solution2 >>= assertEqual "solution 2" 1797)
+    [ TestCase $ assertEqual "solution 1" 280 . solution1 =<< input,
+      TestCase $ assertEqual "solution 2" 1797 . solution2 =<< input
     ]

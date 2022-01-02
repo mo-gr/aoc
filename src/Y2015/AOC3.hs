@@ -1,11 +1,11 @@
 module Y2015.AOC3 where
 
-import Data.Either (fromRight)
+import Data.Functor (($>))
 import Data.List (nub)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, (<|>))
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Data.Functor (($>))
+import Text.Parsec.ByteString (Parser)
+import Util (Input, parseOrDie, (|>))
 
 data Direction = North | South | East | West deriving (Show, Eq)
 
@@ -40,21 +40,25 @@ dezip as = dropLast $ foldl f ([], [], 0) $ reverse as
     dropLast (a, b, _) = (a, b)
 
 -- 2572
-solution1 :: IO Int
-solution1 = do
-  input <- fromRight [] <$> parseFromFile inputParser "AOC3.input"
-  pure $ length $ nub $ run input (0, 0)
+solution1 :: Input -> Int
+solution1 input =
+  do
+    parseOrDie inputParser input
+    |> flip run (0, 0)
+    |> nub
+    |> length
 
 -- 2631
-solution2 :: IO Int
-solution2 = do
-  input <- fromRight [] <$> parseFromFile inputParser "AOC3.input"
-  let (santa, robot) = dezip input
-  pure $ length . nub $ run santa (0, 0) ++ run robot (0, 0)
+solution2 :: Input -> Int
+solution2 input =
+  do
+    parseOrDie inputParser input
+    |> dezip
+    |> \(santa, robot) -> length . nub $ run santa (0, 0) ++ run robot (0, 0)
 
-verify :: Test
-verify =
+verify :: IO Input -> Test
+verify input =
   TestList
-    [ TestCase (solution1 >>= assertEqual "solution 1" 2572),
-      TestCase (solution2 >>= assertEqual "solution 2" 2631)
+    [ TestCase $ assertEqual "solution 2" 2572 . solution1 =<< input,
+      TestCase $ assertEqual "solution 2" 2631 . solution2 =<< input
     ]

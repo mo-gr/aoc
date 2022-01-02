@@ -13,6 +13,7 @@ dependencies:
 - directory
 - logict
 - HUnit
+- hashing
 executables:
   AOC:
     main: Main.hs

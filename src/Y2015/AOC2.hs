@@ -1,11 +1,10 @@
 module Y2015.AOC2 where
 
-import Data.Either (fromRight)
 import Data.List (sort)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, sepBy1)
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Util (number)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, number, parseOrDie, (|>))
 
 type Box = (Int, Int, Int)
 
@@ -42,20 +41,22 @@ ribbon :: Box -> Int
 ribbon box = bow box + wrap box
 
 -- 1588178
-solution1 :: IO Int
-solution1 = do
-  boxes <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
-  return $ sum $ map boxPaper boxes
+solution1 :: Input -> Int
+solution1 input =
+  parseOrDie inputParser input
+    |> map boxPaper
+    |> sum
 
 -- 3783758
-solution2 :: IO Int
-solution2 = do
-  boxes <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
-  return $ sum $ map ribbon boxes
+solution2 :: Input -> Int
+solution2 input =
+  parseOrDie inputParser input
+    |> map ribbon
+    |> sum
 
-verify :: Test
-verify =
+verify :: IO Input -> Test
+verify input =
   TestList
-    [ TestCase (solution1 >>= assertEqual "solution 1" 1588178),
-      TestCase (solution2 >>= assertEqual "solution 2" 3783758)
+    [ TestCase $ assertEqual "solution 1" 1588178 . solution1 =<< input,
+      TestCase $ assertEqual "solution 2" 3783758 . solution2 =<< input
     ]
