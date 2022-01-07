@@ -15,6 +15,7 @@ dependencies:
 - HUnit
 - hashing
 - json
+- apecs
 executables:
   AOC:
     main: Main.hs
