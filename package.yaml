@@ -14,6 +14,7 @@ dependencies:
 - logict
 - HUnit
 - hashing
+- json
 executables:
   AOC:
     main: Main.hs
