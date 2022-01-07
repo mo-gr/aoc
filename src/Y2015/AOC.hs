@@ -3,7 +3,7 @@ module Y2015.AOC where
 import AOC (Day (..), Year (), mkYear)
 import qualified Data.ByteString.Char8 as C
 import Test.HUnit (Test (TestLabel, TestList))
-import Util (Input)
+import Util (Input, unify)
 import qualified Y2015.AOC1
 import qualified Y2015.AOC2
 import qualified Y2015.AOC3
@@ -36,7 +36,7 @@ solution D10 = run Y2015.AOC10.solution1 Y2015.AOC10.solution2 $ loadInput "AOC1
 solution D11 = run Y2015.AOC11.solution1 Y2015.AOC11.solution2 $ loadInput "AOC11"
 solution D12 = run Y2015.AOC12.solution1 Y2015.AOC12.solution2 $ loadInput "AOC12"
 solution D13 = run Y2015.AOC13.solution1 Y2015.AOC13.solution2 $ loadInput "AOC13"
-solution D14 = run Y2015.AOC14.solution1 Y2015.AOC14.solution2 $ loadInput "AOC14"
+solution D14 = unify (Y2015.AOC14.solution1, Y2015.AOC14.solution2)
 solution _ = error "not yet"
 
 verify :: Test
