@@ -1,15 +1,16 @@
 module Y2015.AOC7 where
 
+import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.Bits (complement, shift, (.&.), (.|.))
 import Data.Functor ((<&>))
 import qualified Data.Map.Strict as M
+import Data.Maybe (fromJust)
 import Data.Word (Word16)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (lower, many1, newline, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
-import Data.Maybe (fromJust)
 
 type Signal = Word16
 
@@ -71,32 +72,35 @@ output (Pass _w w) = w
 
 prePass :: World -> World
 prePass w = foldl f w (M.keys w)
-  where f :: World -> Wire -> World
-        f acc k = case eval 10 acc k of
-          Nothing -> acc
-          Just s -> M.insert k (Provider s k) acc
+  where
+    f :: World -> Wire -> World
+    f acc k = case eval 10 acc k of
+      Nothing -> acc
+      Just s -> M.insert k (Provider s k) acc
 
 tillStable :: Eq a => (a -> a) -> a -> a
 tillStable f a = let a' = f a in if a == a' then a else tillStable f a'
 
 eval :: Int -> World -> Wire -> Maybe Signal
 eval 0 _ _ = Nothing
-eval n w wire = let n' = n - 1 in case M.lookup wire w of
-    Nothing -> error $ "unknown wire: " ++ wire ++ "\n" ++ show (length w)
-    Just (Provider s _) -> Just s
-    Just (And a b _) -> do
-        a' <- eval n' w a
-        b' <- eval n' (M.insert a (Provider a' a) w) b
-        pure $ a' .&. b'
-    Just (And1 a _) -> eval n' w a <&> (1 .&.)
-    Just (Or a b _) -> do
-         a' <- eval n' w a
-         b' <- eval n' (M.insert a (Provider a' a) w) b
-         pure $ a' .|. b'
-    Just (Not i _) -> complement <$> eval n' w i
-    Just (RShift s i _) -> eval n' w i <&> flip shift (negate s)
-    Just (LShift s i _) -> eval n' w i <&> flip shift s
-    Just (Pass w' _) -> eval n' w w'
+eval n w wire =
+  let n' = n - 1
+   in case M.lookup wire w of
+        Nothing -> error $ "unknown wire: " ++ wire ++ "\n" ++ show (length w)
+        Just (Provider s _) -> Just s
+        Just (And a b _) -> do
+          a' <- eval n' w a
+          b' <- eval n' (M.insert a (Provider a' a) w) b
+          pure $ a' .&. b'
+        Just (And1 a _) -> eval n' w a <&> (1 .&.)
+        Just (Or a b _) -> do
+          a' <- eval n' w a
+          b' <- eval n' (M.insert a (Provider a' a) w) b
+          pure $ a' .|. b'
+        Just (Not i _) -> complement <$> eval n' w i
+        Just (RShift s i _) -> eval n' w i <&> flip shift (negate s)
+        Just (LShift s i _) -> eval n' w i <&> flip shift s
+        Just (Pass w' _) -> eval n' w w'
 
 -- 16076
 solution1 :: Input -> Int
@@ -111,11 +115,11 @@ solution1 input =
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-      |> M.insert "b" (Provider 16076 "b")
-      |> tillStable prePass
-      |> flip (eval 10) "a"
-      |> fromJust
-      |> signalToInt
+    |> M.insert "b" (Provider 16076 "b")
+    |> tillStable prePass
+    |> flip (eval 10) "a"
+    |> fromJust
+    |> signalToInt
 
 verify :: IO Input -> Test
 verify input =
@@ -123,3 +127,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 16076 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 2797 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

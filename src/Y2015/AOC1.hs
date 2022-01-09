@@ -1,5 +1,6 @@
 module Y2015.AOC1 where
 
+import AOC (Solution (PureSolution))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, string, (<|>))
 import Text.Parsec.ByteString (Parser)
@@ -49,3 +50,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 280 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 1797 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

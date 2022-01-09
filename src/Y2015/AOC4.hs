@@ -1,5 +1,6 @@
 module Y2015.AOC4 where
 
+import AOC (Solution (PureSolution))
 import Crypto.Hash (MD5, hash)
 import Data.ByteString.Char8 (pack)
 import Data.List (isPrefixOf)
@@ -34,3 +35,6 @@ verify input =
 testData, inputData :: String
 testData = "abcdef"
 inputData = "bgvyzdsv"
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

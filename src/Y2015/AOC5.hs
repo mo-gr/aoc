@@ -2,6 +2,7 @@
 
 module Y2015.AOC5 where
 
+import AOC (Solution (PureSolution))
 import Control.Monad (guard)
 import Data.List (group, intersect, isInfixOf)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
@@ -58,3 +59,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 236 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 51 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

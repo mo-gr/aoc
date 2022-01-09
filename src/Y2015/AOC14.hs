@@ -7,13 +7,14 @@
 
 module Y2015.AOC14 where
 
+import AOC (Solution (IOSolution))
 import Apecs
 import Apecs.System (cmapIf)
 import Control.Monad (forM_)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (letter, many1, newline, string)
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Util (Input, number)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, number, parseOrDie)
 
 newtype Position = Position Int deriving (Show)
 
@@ -68,24 +69,23 @@ maxScore = cfold (\mScore (Score s) -> max mScore s) 0
 maxDist = cfold (\mDist (Position p) -> max mDist p) 0
 
 -- 2640
-solution1 :: IO Int
-solution1 = do
-  rsOrErr <- parseFromFile inputParser "AOC14.input"
-  case rsOrErr of
-    Left e -> error $ show e
-    Right rs -> simulate 2503 rs maxDist
+solution1 :: Input -> IO Int
+solution1 input = do
+  let rs = parseOrDie inputParser input
+  simulate 2503 rs maxDist
 
 -- 1102
-solution2 :: IO Int
-solution2 = do
-  rsOrErr <- parseFromFile inputParser "AOC14.input"
-  case rsOrErr of
-    Left e -> error $ show e
-    Right rs -> simulate 2503 rs maxScore
+solution2 :: Input -> IO Int
+solution2 input = do
+  let rs = parseOrDie inputParser input
+  simulate 2503 rs maxScore
 
 verify :: IO Input -> Test
-verify _input =
+verify input =
   TestList
-    [ TestCase $ solution1 >>= assertEqual "solution 1" 2640,
-      TestCase $ solution2 >>= assertEqual "solution 2" 1102
+    [ TestCase $ input >>= solution1 >>= assertEqual "solution 1" 2640,
+      TestCase $ input >>= solution2 >>= assertEqual "solution 2" 1102
     ]
+
+solution :: Solution
+solution = IOSolution solution1 solution2 verify

@@ -1,10 +1,9 @@
 module Y2021.AOC where
 
-import AOC (Day (..), Year (), mkYear)
+import AOC (Day (..), Year (), mkYear, withPath)
 import qualified Data.ByteString.Char8 as C
 import Test.HUnit (Test (TestLabel, TestList))
 import Util (Input)
-import qualified Util (withPath)
 import qualified Y2021.AOC1
 import qualified Y2021.AOC2
 import qualified Y2021.AOC3
@@ -98,7 +97,7 @@ verify =
     ]
 
 inRepl1 :: Day -> IO String
-inRepl1 d = Util.withPath "2021" $ fst $ solution d
+inRepl1 d = withPath "2021" $ fst $ solution d
 
 inRepl2 :: Day -> IO String
-inRepl2 d = Util.withPath "2021" $ snd $ solution d
+inRepl2 d = withPath "2021" $ snd $ solution d

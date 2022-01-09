@@ -1,5 +1,6 @@
 module Y2015.AOC11 where
 
+import AOC (Solution (PureSolution))
 import Control.Monad (guard)
 import Data.List (group)
 import Debug.Trace
@@ -73,3 +74,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 8134462547934010698 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 104120999797989999 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

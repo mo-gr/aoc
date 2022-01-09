@@ -1,10 +1,11 @@
 module Y2015.AOC10 where
 
+import AOC (Solution (PureSolution))
 import Data.Functor ((<&>))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (digit, many1)
 import Text.Parsec.ByteString (Parser)
-import Util (Input, parseOrDie, (|>), times)
+import Util (Input, parseOrDie, times, (|>))
 
 inputParser :: Parser [Int]
 inputParser = many1 (digit <&> (read . pure))
@@ -35,3 +36,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 360154 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 5103798 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

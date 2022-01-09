@@ -1,5 +1,6 @@
 module Y2015.AOC12 where
 
+import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.ByteString.Char8 (unpack)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
@@ -53,3 +54,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 111754 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 65402 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

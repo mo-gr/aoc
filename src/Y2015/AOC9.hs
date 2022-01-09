@@ -1,5 +1,6 @@
 module Y2015.AOC9 where
 
+import AOC (Solution (PureSolution))
 import Data.List (nub, permutations, sort)
 import qualified Data.Map.Strict as M
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
@@ -49,3 +50,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 207 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 804 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify
