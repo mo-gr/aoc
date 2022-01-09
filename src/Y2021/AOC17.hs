@@ -1,5 +1,6 @@
 module Y2021.AOC17 where
 
+import AOC (Solution (PureSolution))
 import Data.List (maximumBy)
 import Data.Maybe (catMaybes)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
@@ -90,3 +91,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 5671 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 4556 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

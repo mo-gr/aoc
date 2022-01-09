@@ -1,11 +1,12 @@
 module Y2021.AOC24 where
 
+import AOC (Solution (PureSolution))
+import Control.Monad (guard)
 import Data.Functor (($>), (<&>))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
-import Text.Parsec (char, many, many1, newline, space, string, (<|>), try)
+import Text.Parsec (char, many, many1, newline, space, string, try, (<|>))
 import Text.Parsec.ByteString (Parser)
-import Util (Input, parseOrDie, (|>), negativeNumber)
-import Control.Monad (guard)
+import Util (Input, negativeNumber, parseOrDie, (|>))
 
 data Op a b
   = Inp a
@@ -38,7 +39,8 @@ data Alu = Alu
     y :: Int,
     z :: Int,
     input :: [Int]
-  } deriving (Show, Eq)
+  }
+  deriving (Show, Eq)
 
 register :: Parser Register
 register =
@@ -80,7 +82,7 @@ inputParser :: Parser [AluOp]
 inputParser = many1 (opParser <* many newline)
 
 eval :: AluOp -> Alu -> Alu
-eval (Inp r) a = setRegister r (head . input $ a) a {input=tail $ input a}
+eval (Inp r) a = setRegister r (head . input $ a) a {input = tail $ input a}
 eval (Add r (Left b)) a = setRegister r (getRegister r a + getRegister b a) a
 eval (Add r (Right b)) a = setRegister r (getRegister r a + b) a
 eval (Mul r (Left b)) a = setRegister r (getRegister r a * getRegister b a) a
@@ -103,26 +105,26 @@ validModelNumber a = getRegister Z a == 0
 
 toNumber :: [Int] -> Int
 toNumber [] = 0
-toNumber (d:ds) = d * (10 ^ length ds) + toNumber ds
+toNumber (d : ds) = d * (10 ^ length ds) + toNumber ds
 
 validateModelNumber :: [AluOp] -> [Int] -> Maybe Int
-validateModelNumber ops mn = 
-  run (mkAlu mn) ops 
-  |> \fin -> if validModelNumber fin then Just . toNumber $ mn else Nothing
+validateModelNumber ops mn =
+  run (mkAlu mn) ops
+    |> \fin -> if validModelNumber fin then Just . toNumber $ mn else Nothing
 
 solution1 :: Input -> Int
 solution1 inp =
   parseOrDie inputParser inp
-    |> \ops -> case validateModelNumber ops (head (validSerials (reverse [1..9]))) of
-       Nothing -> error "something is wrong"
-       Just vmn -> vmn
+    |> \ops -> case validateModelNumber ops (head (validSerials (reverse [1 .. 9]))) of
+      Nothing -> error "something is wrong"
+      Just vmn -> vmn
 
 solution2 :: Input -> Int
 solution2 inp =
   parseOrDie inputParser inp
-      |> \ops -> case validateModelNumber ops (head (validSerials [1..9])) of
-         Nothing -> error "something is wrong"
-         Just vmn -> vmn
+    |> \ops -> case validateModelNumber ops (head (validSerials [1 .. 9])) of
+      Nothing -> error "something is wrong"
+      Just vmn -> vmn
 
 verify :: IO Input -> Test
 verify inp =
@@ -180,5 +182,7 @@ validSerials serialDigits = do
   guard $ i12 <= 9 && i12 > 0
   let i13 = i0 - 8
   guard $ i13 <= 9 && i13 > 0
-  pure [i0,i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13]
+  pure [i0, i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13]
 
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

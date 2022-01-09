@@ -1,5 +1,6 @@
 module Y2021.AOC11 where
 
+import AOC (Solution (PureSolution))
 import Data.Char (digitToInt)
 import Data.List (sortOn)
 import qualified Data.Map.Strict as M
@@ -126,3 +127,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 1694 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 346 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

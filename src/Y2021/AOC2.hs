@@ -1,10 +1,11 @@
 module Y2021.AOC2 where
 
+import AOC (Solution (PureSolution))
+import Data.Functor (($>))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, newline, string, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
-import Data.Functor (($>))
 
 data Direction = Up Int | Down Int | Forward Int deriving (Show, Eq)
 
@@ -20,8 +21,9 @@ startingPos = Position 0 0 0
 
 directionParser :: Parser Direction
 directionParser = do
-  dir <- string "forward " $> Forward 
-      <|> string "down " $> Down 
+  dir <-
+    string "forward " $> Forward
+      <|> string "down " $> Down
       <|> string "up " $> Up
   dist <- number <* newline
   pure $ dir dist
@@ -66,3 +68,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 1815044 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 1739283308 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

@@ -3,6 +3,7 @@
 
 module Y2021.AOC21 where
 
+import AOC (Solution (PureSolution))
 import Data.List (find)
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust)
@@ -122,3 +123,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 855624 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 187451244607486 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

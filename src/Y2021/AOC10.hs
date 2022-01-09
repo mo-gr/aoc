@@ -1,5 +1,6 @@
 module Y2021.AOC10 where
 
+import AOC (Solution (PureSolution))
 import Data.List (sort)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many, newline, oneOf)
@@ -53,7 +54,7 @@ score pr = sum $ fmap points' pr
     points' _ = 0
 
 mid :: [Int] -> Int
-mid xs = xs !! (length xs `div` 2) 
+mid xs = xs !! (length xs `div` 2)
 
 -- 358737
 solution1 :: Input -> Int
@@ -78,3 +79,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 358737 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 4329504793 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

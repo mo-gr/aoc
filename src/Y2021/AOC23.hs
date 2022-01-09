@@ -2,6 +2,7 @@
 
 module Y2021.AOC23 where
 
+import AOC (Solution (PureSolution))
 import Data.List (delete)
 import qualified Data.Map.Strict as M
 import Data.Maybe (isNothing)
@@ -241,3 +242,6 @@ demoState2 =
       ((8, 3), Copper),
       ((8, 4), Amber)
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

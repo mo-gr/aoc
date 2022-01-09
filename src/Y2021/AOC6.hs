@@ -2,6 +2,7 @@
 
 module Y2021.AOC6 where
 
+import AOC (Solution (PureSolution))
 import qualified Data.Map.Strict as M
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, sepBy)
@@ -59,3 +60,6 @@ evolveTank = M.foldrWithKey f emptyTank
 
 countFish :: FishTank -> Int
 countFish = M.foldr (+) 0
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

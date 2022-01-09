@@ -1,5 +1,6 @@
 module Y2021.AOC20 where
 
+import AOC (Solution (PureSolution))
 import Data.Functor (($>))
 import qualified Data.Map.Strict as M
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
@@ -140,3 +141,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 5419 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 17325 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

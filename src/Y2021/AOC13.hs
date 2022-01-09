@@ -2,6 +2,7 @@
 
 module Y2021.AOC13 where
 
+import AOC (Solution (PureSolution))
 import Data.List (nub)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, string, (<|>))
@@ -97,3 +98,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 814 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" result . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 (length . solution2) verify

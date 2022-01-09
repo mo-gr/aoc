@@ -2,6 +2,7 @@
 
 module Y2021.AOC9 where
 
+import AOC (Solution (PureSolution))
 import Data.Char (digitToInt)
 import Data.List (sort)
 import qualified Data.Set as S
@@ -52,11 +53,11 @@ allPoints hm = do
   pure (x, y)
 
 allNeighboursAreSmaller :: HeightMap -> Point -> Bool
-allNeighboursAreSmaller hm p = let this = getAt hm p in
-  neighbours hm p
-    |> fmap (getAt hm)
-    |> all (this <)
-    
+allNeighboursAreSmaller hm p =
+  let this = getAt hm p
+   in neighbours hm p
+        |> fmap (getAt hm)
+        |> all (this <)
 
 countLowPoints :: HeightMap -> Int
 countLowPoints hm =
@@ -109,3 +110,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 518 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 949905 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

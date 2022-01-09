@@ -2,10 +2,11 @@
 
 module Y2021.AOC18 where
 
+import AOC (Solution (PureSolution))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
+import Text.Parsec (char, many, many1, newline, (<|>))
 import Text.Parsec.ByteString (Parser)
-import Util (Input, parseOrDie, (|>), number)
-import Text.Parsec (char, (<|>), many1, newline, many)
+import Util (Input, number, parseOrDie, (|>))
 
 data SnailNumber = Number Int | Pair SnailNumber SnailNumber
   deriving (Eq)
@@ -31,20 +32,22 @@ inputParser :: Parser [SnailNumber]
 inputParser = many1 (snailParser <* many newline)
 
 addSnail :: SnailNumber -> SnailNumber -> SnailNumber
-addSnail n m =  Pair n m |> reduceSnail
+addSnail n m = Pair n m |> reduceSnail
 
 reduceSnail :: SnailNumber -> SnailNumber
 reduceSnail = reduceSnail' 0
 
 reduceSnail' :: Int -> SnailNumber -> SnailNumber
-reduceSnail' 10000 n = error $ "too deep " ++  show n
-reduceSnail' r n =  let expl = explode n
-                        splt = split expl
-                    in if n /= expl
-                       then reduceSnail' (r+1) expl
-                       else if n /= splt
-                            then reduceSnail' (r+1) splt
-                            else n
+reduceSnail' 10000 n = error $ "too deep " ++ show n
+reduceSnail' r n =
+  let expl = explode n
+      splt = split expl
+   in if n /= expl
+        then reduceSnail' (r + 1) expl
+        else
+          if n /= splt
+            then reduceSnail' (r + 1) splt
+            else n
 
 explode :: SnailNumber -> SnailNumber
 explode sn = explode' 0 sn |> fst
@@ -61,30 +64,33 @@ explode' :: Int -> SnailNumber -> (SnailNumber, Maybe (Int, Int))
 explode' _ (Number n) = (Number n, Nothing)
 explode' 4 (Pair (Number n) (Number m)) = (Number 0, Just (n, m))
 explode' rec (Pair n m) =
-  let (nExp, nSpill) = explode' (rec+1) n
-      (mExp, mSpill) = explode' (rec+1) m
-  in case nSpill of
-    Just (l,r) -> case (nExp, m) of
-                    (Number n', Number m') -> if isPair n
-                                             then (Pair (Number n') (Number $ m' + r), Just (l,0))
-                                             else (Pair (Number $ n' + l) (Number $ m' + r), Nothing)
-                    (Number n', p) -> if isPair n
-                                      then (Pair (Number n') (addLeft r p), Just (l,0))
-                                      else (Pair (Number $ n' + l) (addLeft r p), Nothing)
-                    (p, Number m') -> (Pair p (Number $ m' + r), Just (l, 0))
-                    (p, q) -> (Pair p (addLeft r q), Just (l,0))
-    Nothing -> case mSpill of
-      Just (l,r) -> case (nExp, mExp) of
-                    (Number n', Number m') -> if isPair m
-                                             then (Pair (Number $ n' + l) (Number m'), Just (0, r))
-                                             else (Pair (Number $ n' + l) (Number $ m' + r), Nothing)
-                    (p, Number m') -> if isPair m
-                                      then (Pair (addRight l p) (Number m') , Just (0,r))
-                                      else (Pair (addRight l p) (Number $ m' + r), Nothing)
-                    (Number n', p) -> (Pair (Number $ n' + l) p, Just (0, r))
-                    (p, q) -> (Pair (addRight l p) q, Just (0,r))
-      Nothing -> (Pair nExp mExp, Nothing)
-
+  let (nExp, nSpill) = explode' (rec + 1) n
+      (mExp, mSpill) = explode' (rec + 1) m
+   in case nSpill of
+        Just (l, r) -> case (nExp, m) of
+          (Number n', Number m') ->
+            if isPair n
+              then (Pair (Number n') (Number $ m' + r), Just (l, 0))
+              else (Pair (Number $ n' + l) (Number $ m' + r), Nothing)
+          (Number n', p) ->
+            if isPair n
+              then (Pair (Number n') (addLeft r p), Just (l, 0))
+              else (Pair (Number $ n' + l) (addLeft r p), Nothing)
+          (p, Number m') -> (Pair p (Number $ m' + r), Just (l, 0))
+          (p, q) -> (Pair p (addLeft r q), Just (l, 0))
+        Nothing -> case mSpill of
+          Just (l, r) -> case (nExp, mExp) of
+            (Number n', Number m') ->
+              if isPair m
+                then (Pair (Number $ n' + l) (Number m'), Just (0, r))
+                else (Pair (Number $ n' + l) (Number $ m' + r), Nothing)
+            (p, Number m') ->
+              if isPair m
+                then (Pair (addRight l p) (Number m'), Just (0, r))
+                else (Pair (addRight l p) (Number $ m' + r), Nothing)
+            (Number n', p) -> (Pair (Number $ n' + l) p, Just (0, r))
+            (p, q) -> (Pair (addRight l p) q, Just (0, r))
+          Nothing -> (Pair nExp mExp, Nothing)
 
 split :: SnailNumber -> SnailNumber
 split n = case split' n of
@@ -114,12 +120,11 @@ solution1 input =
     |> sumSnail
     |> magnitude
 
-allPairs :: Eq a => [a] -> [(a,a)]
+allPairs :: Eq a => [a] -> [(a, a)]
 allPairs xs = filter (uncurry (/=)) $ do
   x <- xs
   y <- xs
-  pure (x,y)
-
+  pure (x, y)
 
 -- 4656
 solution2 :: Input -> Int
@@ -140,3 +145,5 @@ verify input =
 testData :: Input
 testData = "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]\n[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]\n"
 
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

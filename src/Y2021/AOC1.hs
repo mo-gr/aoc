@@ -1,9 +1,10 @@
 module Y2021.AOC1 where
 
+import AOC (Solution(PureSolution))
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (newline, sepBy1)
 import Text.Parsec.ByteString (Parser)
-import Util (Input, number, (|>), parseOrDie)
+import Util (Input, number, parseOrDie, (|>))
 
 type Measurement = Int
 
@@ -40,3 +41,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 1162 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 1190 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify

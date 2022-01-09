@@ -1,5 +1,6 @@
 module Y2021.AOC8 where
 
+import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.List (delete, find)
 import Data.Maybe (fromMaybe)
@@ -98,3 +99,6 @@ verify input =
     [ TestCase $ assertEqual "solution 1" 470 . solution1 =<< input,
       TestCase $ assertEqual "solution 2" 989396 . solution2 =<< input
     ]
+
+solution :: Solution
+solution = PureSolution solution1 solution2 verify
