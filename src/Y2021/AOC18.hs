@@ -146,4 +146,4 @@ testData :: Input
 testData = "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]\n[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]\n"
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 3524 solution2 4656

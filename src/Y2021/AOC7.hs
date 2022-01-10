@@ -53,4 +53,4 @@ verify input =
     ]
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 349357 solution2 96708205

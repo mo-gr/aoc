@@ -2,7 +2,7 @@
 
 module Y2021.AOC13 where
 
-import AOC (Solution (PureSolution))
+import AOC (Solution (PureStringSolution))
 import Data.List (nub)
 import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, string, (<|>))
@@ -69,11 +69,12 @@ pretty ps =
         c <- if (x, y) `elem` ps then ['#'] else ['.']
         if x == mx then c : ['\n'] else [c]
 
-solution1 :: Input -> Int
+solution1 :: Input -> String
 solution1 input =
   parseOrDie inputParser input
     |> applyFirstFold
     |> length
+    |> show
 
 -- PZEHRAER
 result :: [String]
@@ -86,18 +87,19 @@ result =
     "#....####.####.#..#.#..#.#..#.####.#..#"
   ]
 
-solution2 :: Input -> [String]
+solution2 :: Input -> String
 solution2 input =
   parseOrDie inputParser input
     |> applyAllFolds
     |> pretty
+    |> mconcat
 
 verify :: IO Input -> Test
 verify input =
   TestList
-    [ TestCase $ assertEqual "solution 1" 814 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" result . solution2 =<< input
+    [ TestCase $ assertEqual "solution 1" "814" . solution1 =<< input,
+      TestCase $ assertEqual "solution 2" (mconcat result) . solution2 =<< input
     ]
 
 solution :: Solution
-solution = PureSolution solution1 (length . solution2) verify
+solution = PureStringSolution solution1 "814" solution2 (mconcat result)

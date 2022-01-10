@@ -62,4 +62,4 @@ countFish :: FishTank -> Int
 countFish = M.foldr (+) 0
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 353274 solution2 1609314870967

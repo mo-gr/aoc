@@ -1,6 +1,6 @@
 module Y2019.AOC where
 
-import AOC (Day (..), Year (), mkYear, showBoth)
+import AOC (Day (..), Year (), mkYear)
 import Test.HUnit (Test (TestList))
 import qualified Y2019.AOC1
 import qualified Y2019.AOC10
@@ -40,6 +40,9 @@ solution D14 = showBoth (Y2019.AOC14.solution1, Y2019.AOC14.solution2)
 solution D15 = showBoth (Y2019.AOC15.solution1, Y2019.AOC15.solution2)
 solution D16 = showBoth (Y2019.AOC16.solution1, Y2019.AOC16.solution2)
 solution _ = error "not yet"
+
+showBoth :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
+showBoth (a, b) = (show <$> a, show <$> b)
 
 verify2019 :: Test
 verify2019 =

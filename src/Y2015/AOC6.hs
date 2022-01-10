@@ -107,4 +107,4 @@ pretty ls = sequence_ $ do
   pure $ if M.lookup (x, y) ls == Just On then prnt "#" else prnt "."
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 569999 solution2 17836115

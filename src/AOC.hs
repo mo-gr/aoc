@@ -4,8 +4,9 @@ module AOC where
 
 import Control.Exception (bracket)
 import qualified Data.ByteString.Char8 as C
+import Data.Functor ((<&>))
 import System.Directory
-import Test.HUnit (Test)
+import Test.HUnit (Test (TestCase, TestLabel, TestList), assertEqual)
 import Util (Input)
 
 data Day
@@ -132,33 +133,57 @@ mkYear y s v =
       verify = v
     }
 
+mkYear' :: String -> (Day -> Solution) -> Year
+mkYear' y lookUpDay = mkYear y (runSolution =<< lookUpDay) (TestList $ mkTests <$> [D1 .. D25])
+  where
+    mkTests d =
+      let input :: IO Input
+          input = loadInput d
+       in TestLabel ("Day " <> show (fromEnum d)) $
+            TestList $ case lookUpDay d of
+              PureSolution {part1, solution1, part2, solution2} ->
+                [ TestCase $ assertEqual "solution 1" solution1 . part1 =<< input,
+                  TestCase $ assertEqual "solution 2" solution2 . part2 =<< input
+                ]
+              PureStringSolution {part1String, solution1String, part2String, solution2String} ->
+                [ TestCase $ assertEqual "solution 1" solution1String . part1String =<< input,
+                  TestCase $ assertEqual "solution 2" solution2String . part2String =<< input
+                ]
+              IOSolution {part1IO, solution1, part2IO, solution2} ->
+                [ TestCase $ input >>= part1IO >>= assertEqual "solution 1" solution1,
+                  TestCase $ input >>= part2IO >>= assertEqual "solution 2" solution2
+                ]
+
 inputName :: Day -> String
 inputName d = "AOC" <> show (fromEnum d)
 
 data Solution
-  = PureSolution
+  = PureStringSolution
+      { part1String :: Input -> String,
+        solution1String :: String,
+        part2String :: Input -> String,
+        solution2String :: String
+      }
+  | PureSolution
       { part1 :: Input -> Int,
+        solution1 :: Int,
         part2 :: Input -> Int,
-        verifySolutions :: IO Input -> Test
+        solution2 :: Int
       }
   | IOSolution
       { part1IO :: Input -> IO Int,
+        solution1 :: Int,
         part2IO :: Input -> IO Int,
-        verifySolutions :: IO Input -> Test
+        solution2 :: Int
       }
 
 runSolution :: Solution -> Day -> (IO String, IO String)
-runSolution PureSolution {part1, part2} d = run part1 part2 $ loadInput ("AOC" <> show (fromEnum d))
-runSolution IOSolution {part1IO, part2IO} d = showBoth (loadInput ("AOC" <> show (fromEnum d)) >>= part1IO, loadInput ("AOC" <> show (fromEnum d)) >>= part2IO)
+runSolution PureSolution {part1, part2} d = (loadInput d <&> show . part1, loadInput d <&> show . part2)
+runSolution PureStringSolution {part1String, part2String} d = (loadInput d <&> part1String, loadInput d <&> part2String)
+runSolution IOSolution {part1IO, part2IO} d = (show <$> (loadInput d >>= part1IO), show <$> (loadInput d >>= part2IO))
 
-loadInput :: String -> IO Input
-loadInput d = C.readFile $ d ++ ".input"
-
-run :: (Show b, Show c) => (a -> b) -> (a -> c) -> IO a -> (IO String, IO String)
-run f g a = (show . f <$> a, show . g <$> a)
-
-showBoth :: (Show a, Show b) => (IO a, IO b) -> (IO String, IO String)
-showBoth (a, b) = (show <$> a, show <$> b)
+loadInput :: Day -> IO Input
+loadInput d = C.readFile $ ("AOC" <> show (fromEnum d)) ++ ".input"
 
 setupPath :: String -> IO FilePath
 setupPath dir = do

@@ -88,4 +88,4 @@ verify input =
     ]
 
 solution :: Solution
-solution = IOSolution solution1 solution2 verify
+solution = IOSolution solution1 2640 solution2 1102

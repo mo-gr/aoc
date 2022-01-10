@@ -1,7 +1,6 @@
 module Y2021.AOC where
 
-import AOC (Day (..), Solution, Year (), loadInput, mkYear, runSolution, verifySolutions)
-import Test.HUnit (Test (TestLabel, TestList))
+import AOC (Day (..), Solution, Year (), mkYear')
 import qualified Y2021.AOC1
 import qualified Y2021.AOC10
 import qualified Y2021.AOC11
@@ -55,14 +54,5 @@ lookUpDay D23 = Y2021.AOC23.solution
 lookUpDay D24 = Y2021.AOC24.solution
 lookUpDay D25 = Y2021.AOC25.solution
 
-solution :: Day -> (IO String, IO String)
-solution = runSolution =<< lookUpDay
-
-verify :: Test
-verify =
-  TestList $ test <$> [D1 .. D14]
-  where
-    test d = TestLabel ("2021 Day " <> show (fromEnum d)) $ verifySolutions (lookUpDay d) (loadInput ("AOC" <> show (fromEnum d)))
-
 year :: Year
-year = mkYear "2021" solution verify
+year = mkYear' "2021" lookUpDay

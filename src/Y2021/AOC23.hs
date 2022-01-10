@@ -244,4 +244,4 @@ demoState2 =
     ]
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 16489 solution2 43413

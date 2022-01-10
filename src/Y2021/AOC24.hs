@@ -185,4 +185,4 @@ validSerials serialDigits = do
   pure [i0, i1, i2, i3, i4, i5, i6, i7, i8, i9, i10, i11, i12, i13]
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 99299513899971 solution2 93185111127911

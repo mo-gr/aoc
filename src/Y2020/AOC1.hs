@@ -1,9 +1,11 @@
 module Y2020.AOC1 where
 
+import AOC (Solution (PureSolution))
 import Data.List (find)
 import Text.Parsec (many1, skipMany, space)
 import Text.Parsec.ByteString (Parser, parseFromFile)
-import Util (number)
+import Util (number, Input, (|>), parseOrDie)
+import Data.Maybe (fromJust)
 
 parseExpenses :: Parser [Int]
 parseExpenses = many1 (number <* skipMany space)
@@ -42,17 +44,20 @@ findSum20203 :: [Int] -> Maybe (Int, Int, Int)
 findSum20203 = find (\(x, y, z) -> x + y + z == 2020) . allTriples
 
 -- 545379
-solution1 :: IO (Maybe Int)
-solution1 = do
-  expensesOrErr <- parseFromFile parseExpenses "AOC1.input"
-  case expensesOrErr of
-    Left e -> error $ show e
-    Right expenses -> return . mulExpenses $ findSum2020 expenses
+solution1 :: Input -> Int
+solution1 input = do
+  parseOrDie parseExpenses input
+    |> findSum2020
+    |> mulExpenses
+    |> fromJust
 
 -- 257778836
-solution2 :: IO (Maybe Int)
-solution2 = do
-  expensesOrErr <- parseFromFile parseExpenses "AOC1.input"
-  case expensesOrErr of
-    Left e -> error $ show e
-    Right expenses -> return . mulExpenses3 $ findSum20203 expenses
+solution2 :: Input -> Int
+solution2 input = do
+  parseOrDie parseExpenses input
+      |> findSum20203
+      |> mulExpenses3
+      |> fromJust
+
+solution :: Solution
+solution = PureSolution solution1 545379 solution2 257778836

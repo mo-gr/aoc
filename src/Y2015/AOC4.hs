@@ -37,4 +37,4 @@ testData = "abcdef"
 inputData = "bgvyzdsv"
 
 solution :: Solution
-solution = PureSolution solution1 solution2 verify
+solution = PureSolution solution1 254575 solution2 1038736
