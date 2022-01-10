@@ -4,7 +4,6 @@ module Y2021.AOC5 where
 
 import AOC (Solution (PureSolution))
 import Data.List (group, sort)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, sepBy, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -63,13 +62,6 @@ solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
     |> countDuplicates
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 7318 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 19939 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 7318 solution2 19939

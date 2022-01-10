@@ -4,7 +4,6 @@ module Y2021.AOC13 where
 
 import AOC (Solution (PureStringSolution))
 import Data.List (nub)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, string, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -93,13 +92,6 @@ solution2 input =
     |> applyAllFolds
     |> pretty
     |> mconcat
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" "814" . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" (mconcat result) . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureStringSolution solution1 "814" solution2 (mconcat result)

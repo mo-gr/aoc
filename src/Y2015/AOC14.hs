@@ -11,7 +11,6 @@ import AOC (Solution (IOSolution))
 import Apecs
 import Apecs.System (cmapIf)
 import Control.Monad (forM_)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (letter, many1, newline, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie)
@@ -79,13 +78,6 @@ solution2 :: Input -> IO Int
 solution2 input = do
   let rs = parseOrDie inputParser input
   simulate 2503 rs maxScore
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ input >>= solution1 >>= assertEqual "solution 1" 2640,
-      TestCase $ input >>= solution2 >>= assertEqual "solution 2" 1102
-    ]
 
 solution :: Solution
 solution = IOSolution solution1 2640 solution2 1102

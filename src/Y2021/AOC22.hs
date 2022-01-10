@@ -6,7 +6,6 @@ import AOC (Solution (PureSolution))
 import Data.Foldable (foldr')
 import Data.Functor (($>))
 import Data.Maybe (catMaybes)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, newline, string, try, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, negativeNumber, parseOrDie, (|>))
@@ -97,12 +96,6 @@ solution2 input =
     |> runReverse
 
 -- 1134088247046731
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 588120 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 1134088247046731 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 588120 solution2 1134088247046731

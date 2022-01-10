@@ -24,6 +24,7 @@ safeHead (a : _) = Just a
 
 (|>) :: a -> (a -> c) -> c
 (|>) = flip ($)
+infixl 8 |>
 
 times :: Int -> (a -> a) -> a -> a
 times 0 _ a = a

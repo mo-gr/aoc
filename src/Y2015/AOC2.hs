@@ -2,7 +2,6 @@ module Y2015.AOC2 where
 
 import AOC (Solution (PureSolution))
 import Data.List (sort)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, sepBy1)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -54,13 +53,6 @@ solution2 input =
   parseOrDie inputParser input
     |> map ribbon
     |> sum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 1588178 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 3783758 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 1588178 solution2 3783758

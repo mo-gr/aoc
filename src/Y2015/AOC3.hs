@@ -3,7 +3,6 @@ module Y2015.AOC3 where
 import AOC (Solution (PureSolution))
 import Data.Functor (($>))
 import Data.List (nub)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -56,13 +55,6 @@ solution2 input =
     parseOrDie inputParser input
     |> dezip
     |> \(santa, robot) -> length . nub $ run santa (0, 0) ++ run robot (0, 0)
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 2" 2572 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 2631 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 2572 solution2 2631

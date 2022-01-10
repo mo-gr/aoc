@@ -8,7 +8,6 @@ import Data.Char (digitToInt)
 import Data.List (minimumBy)
 import qualified Data.Map.Strict as M
 import qualified Data.Set as S
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (digit, many1, newline)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -125,13 +124,6 @@ solution2 input =
   parseOrDie inputParser input
     |> blowUp
     |> runAStarCost
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 388 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 2819 . solution2 =<< input
-    ]
 
 testData :: Input
 testData = "1163751742\n1381373672\n2136511328\n3694931569\n7463417111\n1319128137\n1359912421\n3125421639\n1293138521\n2311944581\n"

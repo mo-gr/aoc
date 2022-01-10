@@ -3,7 +3,6 @@ module Y2021.AOC24 where
 import AOC (Solution (PureSolution))
 import Control.Monad (guard)
 import Data.Functor (($>), (<&>))
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many, many1, newline, space, string, try, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, negativeNumber, parseOrDie, (|>))
@@ -125,13 +124,6 @@ solution2 inp =
     |> \ops -> case validateModelNumber ops (head (validSerials [1 .. 9])) of
       Nothing -> error "something is wrong"
       Just vmn -> vmn
-
-verify :: IO Input -> Test
-verify inp =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 99299513899971 . solution1 =<< inp,
-      TestCase $ assertEqual "solution 2" 93185111127911 . solution2 =<< inp
-    ]
 
 -- explanations stolen from https://github.com/dphilipson/advent-of-code-2021/blob/master/src/days/day24.rs
 -- not sure I would have managed to figure this out myself...

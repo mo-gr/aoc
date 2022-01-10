@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Data.Bifunctor (first, second)
 import Data.Functor (($>))
 import qualified Data.Map.Strict as M
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -75,13 +74,6 @@ solution1 input =
 -- does not exist
 solution2 :: Input -> Int
 solution2 _input = 0
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 523 . solution1 =<< input
-    --TestCase $ assertEqual "solution 2" undefined . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 523 solution2 0

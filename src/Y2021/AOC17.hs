@@ -3,7 +3,6 @@ module Y2021.AOC17 where
 import AOC (Solution (PureSolution))
 import Data.List (maximumBy)
 import Data.Maybe (catMaybes)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, negativeNumber, parseOrDie, (|>))
@@ -84,13 +83,6 @@ solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
     |> countShotgunHits
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 5671 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 4556 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 5671 solution2 4556

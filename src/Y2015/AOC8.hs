@@ -3,7 +3,6 @@ module Y2015.AOC8 where
 import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, hexDigit, lower, many, many1, newline, notFollowedBy, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -66,13 +65,6 @@ solution2 input =
           |> fmap length
           |> sum
    in escapedLength - rawLength
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 1333 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 2046 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 1333 solution2 2046

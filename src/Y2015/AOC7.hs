@@ -7,7 +7,6 @@ import Data.Functor ((<&>))
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust)
 import Data.Word (Word16)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (lower, many1, newline, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -120,13 +119,6 @@ solution2 input =
     |> flip (eval 10) "a"
     |> fromJust
     |> signalToInt
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 16076 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 2797 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 16076 solution2 2797

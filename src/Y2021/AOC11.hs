@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Data.Char (digitToInt)
 import Data.List (sortOn)
 import qualified Data.Map.Strict as M
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (digit, many, many1, newline)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, times, (|>))
@@ -120,13 +119,6 @@ solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
     |> countTilAllZero 0
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 1694 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 346 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 1694 solution2 346

@@ -2,7 +2,6 @@ module Y2021.AOC10 where
 
 import AOC (Solution (PureSolution))
 import Data.List (sort)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many, newline, oneOf)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -72,13 +71,6 @@ solution2 input =
     |> filter (/= 0)
     |> sort
     |> mid
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 358737 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 4329504793 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 358737 solution2 4329504793

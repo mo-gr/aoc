@@ -3,7 +3,6 @@ module Y2015.AOC12 where
 import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.ByteString.Char8 (unpack)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import qualified Text.JSON as JSON
 import Text.Parsec (endBy, letter, many, newline, oneOf)
 import Text.Parsec.ByteString (Parser)
@@ -47,13 +46,6 @@ solution2 input =
   parseJson input
     |> extractNonRedNumbers
     |> sum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 111754 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 65402 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 111754 solution2 65402

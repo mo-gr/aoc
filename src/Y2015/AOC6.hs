@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
 import qualified Data.Map.Strict as M
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (many1, newline, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -91,13 +90,6 @@ solution2 input =
     |> M.elems
     |> fmap lightVal
     |> sum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 569999 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 17836115 . solution2 =<< input
-    ]
 
 pretty :: Lights -> IO ()
 pretty ls = sequence_ $ do

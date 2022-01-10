@@ -5,7 +5,6 @@ import Data.Functor ((<&>))
 import Data.List (nub, permutations, sort)
 import qualified Data.Map.Strict as M
 import Data.Tuple (swap)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (letter, many1, newline, string, try, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -53,13 +52,6 @@ solution2 input =
   parseOrDie inputParser input
     |> insertMe
     |> maxHappy
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 664 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 640 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 664 solution2 640

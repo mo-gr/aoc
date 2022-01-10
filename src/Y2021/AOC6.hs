@@ -4,7 +4,6 @@ module Y2021.AOC6 where
 
 import AOC (Solution (PureSolution))
 import qualified Data.Map.Strict as M
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, sepBy)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, times, (|>))
@@ -35,13 +34,6 @@ solution2 input =
     |> toTank
     |> times 256 evolveTank
     |> countFish
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 353274 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 1609314870967 . solution2 =<< input
-    ]
 
 type FishTank = M.Map Int Int
 

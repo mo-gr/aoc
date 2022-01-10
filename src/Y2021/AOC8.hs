@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
 import Data.List (delete, find)
 import Data.Maybe (fromMaybe)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (count, many, many1, oneOf, space, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -92,13 +91,6 @@ solution2 input =
   parseOrDie inputParser input
     |> fmap output
     |> sum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 470 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 989396 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 470 solution2 989396

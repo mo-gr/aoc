@@ -3,7 +3,6 @@ module Y2015.AOC11 where
 import AOC (Solution (PureStringSolution))
 import Control.Monad (guard)
 import Data.List (group)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (lower, many1)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -60,13 +59,6 @@ solution2 input =
 
 toOneInt :: [Int] -> Int
 toOneInt is = fmap show is |> mconcat |> read
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" "hxbxxyzz" . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" "hxcaabcc" . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureStringSolution solution1 "hxbxxyzz" solution2 "hxcaabcc"

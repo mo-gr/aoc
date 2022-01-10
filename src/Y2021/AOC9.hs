@@ -6,7 +6,6 @@ import AOC (Solution (PureSolution))
 import Data.Char (digitToInt)
 import Data.List (sort)
 import qualified Data.Set as S
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (digit, many, many1, newline)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -103,13 +102,6 @@ solution2 input =
   parseOrDie inputParser input
     |> threeBiggestBasins
     |> product
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 518 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 949905 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 518 solution2 949905

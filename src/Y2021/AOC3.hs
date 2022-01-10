@@ -2,7 +2,6 @@ module Y2021.AOC3 where
 
 import AOC (Solution (PureSolution))
 import Data.Functor (($>))
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many1, newline, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -100,13 +99,6 @@ solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
     |> lifeSupport
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 1092896 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 4672151 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 1092896 solution2 4672151

@@ -6,7 +6,6 @@ import AOC (Solution (PureSolution))
 import Data.List (delete)
 import qualified Data.Map.Strict as M
 import Data.Maybe (isNothing)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, (|>))
 
@@ -164,13 +163,6 @@ solution2 _input =
   solve 4 50000 inputWorld2
     |> fmap fst
     |> minimum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 16489 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 43413 . solution2 =<< input
-    ]
 
 testData :: Input
 testData = "no parsing, input is hardcoded"

@@ -5,7 +5,8 @@ module Y2020.AOC2 where
 import           Data.Either            (fromRight)
 import           Text.Parsec            (letter, many1, skipMany, space, string)
 import           Text.Parsec.ByteString (Parser, parseFromFile)
-import           Util                   (number)
+import           Util                   (number, Input, parseOrDie, (|>))
+import AOC (Solution(PureSolution))
 
 data Policy = Policy { character::Char, minCount::Int, maxCount::Int } deriving (Show)
 
@@ -54,13 +55,18 @@ evalPolicyToboggan (Policy{..}, password) = let first = password !! dec minCount
   (first == character && second /= character) || (first /= character && second == character)
 
 -- 625
-solution1 :: IO Int
-solution1 = do
-  policies <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
-  return $ length $ filter evalPolicy policies
+solution1 :: Input -> Int
+solution1 input =
+  parseOrDie inputParser input
+    |> filter evalPolicy
+    |> length
 
 -- 391
-solution2 :: IO Int
-solution2 = do
-  policies <- fromRight [] <$> parseFromFile inputParser "AOC2.input"
-  return $ length $ filter evalPolicyToboggan policies
+solution2 :: Input -> Int
+solution2 input =
+  parseOrDie inputParser input
+    |> filter evalPolicyToboggan
+    |> length
+
+solution :: Solution
+solution = PureSolution solution1 625 solution2 391

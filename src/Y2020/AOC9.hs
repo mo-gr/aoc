@@ -1,9 +1,9 @@
 module Y2020.AOC9 where
 
-import Data.Either (fromRight)
+import AOC (Solution (PureSolution))
 import Text.Parsec (endOfLine, many1)
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Util (number)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, number, parseOrDie, (|>))
 
 inputParser :: Parser [Int]
 inputParser = many1 (number <* endOfLine)
@@ -37,15 +37,16 @@ findRange target xs = case sumUp xs 0 of
       GT -> Nothing
 
 -- 27911108
-solution1 :: IO Int
-solution1 = do
-  numbers <- fromRight [] <$> parseFromFile inputParser "AOC9.input"
-  return $ firstInvalidXMAS 25 numbers
+solution1 :: Input -> Int
+solution1 input = parseOrDie inputParser input |> firstInvalidXMAS 25
 
 -- 4023754
-solution2 :: IO Int
-solution2 = do
-  numbers <- fromRight [] <$> parseFromFile inputParser "AOC9.input"
-  let target = firstInvalidXMAS 25 numbers
-  let range = findRange target numbers
-  return $ sum [minimum range, maximum range]
+solution2 :: Input -> Int
+solution2 input =
+  let numbers = parseOrDie inputParser input
+      target = firstInvalidXMAS 25 numbers
+      range = findRange target numbers
+   in sum [minimum range, maximum range]
+
+solution :: Solution
+solution = PureSolution solution1 27911108 solution2 4023754

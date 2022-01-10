@@ -2,8 +2,8 @@
 
 module Y2020.AOC16 where
 
+import AOC (Solution (PureSolution))
 import Data.Bifunctor (second)
-import Data.Either (fromRight)
 import qualified Data.Map.Strict as M
 import Text.Parsec
   ( char,
@@ -15,8 +15,8 @@ import Text.Parsec
     string,
     (<|>),
   )
-import Text.Parsec.ByteString (Parser, parseFromFile)
-import Util (number)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, number, parseOrDie, (|>))
 
 ruleParser :: Parser Rule
 ruleParser = do
@@ -72,25 +72,25 @@ fieldCandidates :: Rule -> [Ticket] -> [Int]
 fieldCandidates Rule {validRange} tickets = filter (\idx -> all (\Ticket {fieldValues} -> (fieldValues !! idx) `elem` validRange) tickets) [0 .. length (fieldValues (head tickets)) - 1]
 
 -- 22057
-solution1 :: IO Int
-solution1 = do
-  input <- fromRight undefined <$> parseFromFile inputParser "AOC16.input"
-  return $ sum . invalidFields $ input
+solution1 :: Input -> Int
+solution1 input = parseOrDie inputParser input |> sum . invalidFields
 
 -- 1093427331937
-solution2 :: IO Int
-solution2 = do
-  state@(rules, myTicket, _tickets) <- fromRight undefined <$> parseFromFile inputParser "AOC16.input"
-  let candidates = M.fromList $ (\r@Rule {fieldName} -> (fieldName, fieldCandidates r (myTicket : discardInvalidTickets state))) <$> rules
-  let resolved = resolve candidates M.empty
-  let Ticket {fieldValues = myFields} = myTicket
-  return $
-    (myFields !! (resolved M.! "departure location"))
-      * (myFields !! (resolved M.! "departure station"))
-      * (myFields !! (resolved M.! "departure platform"))
-      * (myFields !! (resolved M.! "departure track"))
-      * (myFields !! (resolved M.! "departure date"))
-      * (myFields !! (resolved M.! "departure time"))
+solution2 :: Input -> Int
+solution2 input =
+  let state@(rules, myTicket, _tickets) = parseOrDie inputParser input
+      candidates = M.fromList $ (\r@Rule {fieldName} -> (fieldName, fieldCandidates r (myTicket : discardInvalidTickets state))) <$> rules
+      resolved = resolve candidates M.empty
+      Ticket {fieldValues = myFields} = myTicket
+   in (myFields !! (resolved M.! "departure location"))
+        * (myFields !! (resolved M.! "departure station"))
+        * (myFields !! (resolved M.! "departure platform"))
+        * (myFields !! (resolved M.! "departure track"))
+        * (myFields !! (resolved M.! "departure date"))
+        * (myFields !! (resolved M.! "departure time"))
+
+solution :: Solution
+solution = PureSolution solution1 22057 solution2 1093427331937
 
 resolve :: M.Map String [Int] -> M.Map String Int -> M.Map String Int
 resolve candidates known | M.empty == candidates = known

@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Data.List (find, transpose)
 import Data.Maybe (isJust)
 import qualified Data.Set as S
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, count, many, newline, sepBy1, space, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -74,13 +73,6 @@ solution2 input =
   parseOrDie inputParser input
     |> playTilLoser [] Nothing
     |> calculateScore
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 8580 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 9576 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 8580 solution2 9576

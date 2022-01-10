@@ -3,7 +3,6 @@
 module Y2021.AOC18 where
 
 import AOC (Solution (PureSolution))
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (char, many, many1, newline, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -134,13 +133,6 @@ solution2 input =
     |> fmap (reduceSnail . uncurry addSnail)
     |> fmap magnitude
     |> maximum
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 3524 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 4656 . solution2 =<< input
-    ]
 
 testData :: Input
 testData = "[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]\n[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]\n"

@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Data.Bifunctor (first)
 import Data.List (group, sort)
 import qualified Data.Map.Strict as M
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (count, many1, newline, string, upper)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, times, (|>))
@@ -91,13 +90,6 @@ solution2 input =
     |> fmap M.fromList
     |> uncurry (reactTimes' 40)
     |> score'
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 2712 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 8336623059567 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 2712 solution2 8336623059567

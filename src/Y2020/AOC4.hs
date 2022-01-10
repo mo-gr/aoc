@@ -1,11 +1,21 @@
 module Y2020.AOC4 where
 
-import           Data.Either            (fromRight)
-import qualified Data.Set               as S
-import           Text.Parsec            (alphaNum, char, count, endOfLine,
-                                         letter, many1, sepBy1, space, string,
-                                         (<|>))
-import           Text.Parsec.ByteString (Parser, parseFromFile)
+import AOC (Solution (PureSolution))
+import qualified Data.Set as S
+import Text.Parsec
+  ( alphaNum,
+    char,
+    count,
+    endOfLine,
+    letter,
+    many1,
+    sepBy1,
+    space,
+    string,
+    (<|>),
+  )
+import Text.Parsec.ByteString (Parser)
+import Util (Input, parseOrDie, (|>))
 
 fieldParser :: Parser (String, String)
 fieldParser = do
@@ -52,13 +62,18 @@ isValidPassportData ("pid", pid) = all (`elem` "0123456789") pid && length pid =
 isValidPassportData _ = True
 
 -- 260
-solution1 :: IO Int
-solution1 = do
-  passports <- fromRight [] <$> parseFromFile inputParser "AOC4.input"
-  return . length . filter isValidPassport $ passports
+solution1 :: Input -> Int
+solution1 input =
+  parseOrDie inputParser input
+    |> filter isValidPassport
+    |> length
 
 -- 153
-solution2 :: IO Int
-solution2 = do
-  passports <- fromRight [] <$> parseFromFile inputParser "AOC4.input"
-  return . length . filter isValidPassport' $ passports
+solution2 :: Input -> Int
+solution2 input =
+  parseOrDie inputParser input
+    |> filter isValidPassport'
+    |> length
+
+solution :: Solution
+solution = PureSolution solution1 260 solution2 153

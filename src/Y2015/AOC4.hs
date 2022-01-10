@@ -4,7 +4,6 @@ import AOC (Solution (PureSolution))
 import Crypto.Hash (MD5, hash)
 import Data.ByteString.Char8 (pack)
 import Data.List (isPrefixOf)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Util (Input)
 
 md5 :: String -> String
@@ -24,13 +23,6 @@ solution1 _input = solve 0 "00000" inputData
 -- 1038736
 solution2 :: Input -> Int
 solution2 _input = solve 0 "000000" inputData
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 254575 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 1038736 . solution2 =<< input
-    ]
 
 testData, inputData :: String
 testData = "abcdef"

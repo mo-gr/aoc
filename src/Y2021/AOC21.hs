@@ -7,7 +7,6 @@ import AOC (Solution (PureSolution))
 import Data.List (find)
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust)
-import Test.HUnit (Test (TestCase, TestList), assertEqual)
 import Text.Parsec (newline, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -116,13 +115,6 @@ solution2 input =
     |> playDiracMapTilStable 20
     |> byWinnings
     |> uncurry max
-
-verify :: IO Input -> Test
-verify input =
-  TestList
-    [ TestCase $ assertEqual "solution 1" 855624 . solution1 =<< input,
-      TestCase $ assertEqual "solution 2" 187451244607486 . solution2 =<< input
-    ]
 
 solution :: Solution
 solution = PureSolution solution1 855624 solution2 187451244607486
