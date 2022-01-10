@@ -1,7 +1,6 @@
 module Y2020.AOC where
 
-import AOC (Day (..), Year (), Solution (), mkYear')
-import Test.HUnit (Test (TestList))
+import AOC (Day (..), Solution (), Year (), mkYear')
 import qualified Y2020.AOC1
 import qualified Y2020.AOC10
 import qualified Y2020.AOC11

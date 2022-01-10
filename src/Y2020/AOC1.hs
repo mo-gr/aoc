@@ -3,7 +3,7 @@ module Y2020.AOC1 where
 import AOC (Solution (PureSolution))
 import Data.List (find)
 import Text.Parsec (many1, skipMany, space)
-import Text.Parsec.ByteString (Parser, parseFromFile)
+import Text.Parsec.ByteString (Parser)
 import Util (number, Input, (|>), parseOrDie)
 import Data.Maybe (fromJust)
 
