@@ -2,11 +2,9 @@ module Y2015.AOC19 where
 
 import AOC (Solution (PureSolution))
 import Control.Applicative (empty, (<|>))
-import Control.Monad (guard)
 import Control.Monad.Logic (Logic, observe)
 import Data.List (isPrefixOf, nub, sort)
 import Data.Maybe (mapMaybe)
-import qualified Data.Set as S
 import Text.Parsec (letter, many1, newline, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
@@ -37,16 +35,11 @@ explode inp rs = nub . sort $ recur inp
 choose :: [a] -> Logic a
 choose = foldr ((<|>) . pure) empty
 
-fabricate :: String -> String -> Int -> S.Set String -> [Replacement] -> Logic Int
-fabricate origin goal currentCost _seenBefore _rs | origin == goal = pure currentCost
-fabricate origin goal currentCost seenBefore rs = do
-  guard $ S.notMember origin seenBefore
+fabricate :: String -> String -> Int -> [Replacement] -> Logic Int
+fabricate origin goal currentCost _rs | origin == goal = pure currentCost
+fabricate origin goal currentCost rs = do
   evolution <- choose $ explode origin rs
-  guard $ S.notMember evolution seenBefore
-  fabricate evolution goal (succ currentCost) (S.insert origin seenBefore) rs
-
-test :: Int
-test = observe $ fabricate "HOHOHO" "e" 0 S.empty $ fmap swap [("e", "H"), ("e", "O"), ("H", "HO"), ("H", "OH"), ("O", "HH")]
+  fabricate evolution goal (succ currentCost) rs
 
 swap :: (a, b) -> (b, a)
 swap (a, b) = (b, a)
@@ -66,7 +59,7 @@ solution2 :: Input -> Int
 solution2 input =
   let (medicine, rules) = parseOrDie inputParser input
    in fmap rreverse rules
-        |> fabricate (reverse medicine) "e" 0 S.empty
+        |> fabricate (reverse medicine) "e" 0
         |> observe
 
 solution :: Solution
