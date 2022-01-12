@@ -2,7 +2,7 @@
 
 module Y2021.AOC13 where
 
-import AOC (Solution (PureStringSolution))
+import AOC (Solution (PureSolution))
 import Data.List (nub)
 import Text.Parsec (char, many1, newline, string, (<|>))
 import Text.Parsec.ByteString (Parser)
@@ -94,4 +94,4 @@ solution2 input =
     |> mconcat
 
 solution :: Solution
-solution = PureStringSolution solution1 "814" solution2 (mconcat result)
+solution = PureSolution solution1 "814" solution2 (mconcat result)

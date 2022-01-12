@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
 module AOC where
@@ -145,10 +146,6 @@ mkYear' y lookUpDay = mkYear y (runSolution =<< lookUpDay) (TestList $ mkTests <
                 [ TestCase $ assertEqual "solution 1" solution1 . part1 =<< input,
                   TestCase $ assertEqual "solution 2" solution2 . part2 =<< input
                 ]
-              PureStringSolution {part1String, solution1String, part2String, solution2String} ->
-                [ TestCase $ assertEqual "solution 1" solution1String . part1String =<< input,
-                  TestCase $ assertEqual "solution 2" solution2String . part2String =<< input
-                ]
               IOSolution {part1IO, solution1, part2IO, solution2} ->
                 [ TestCase $ input >>= part1IO >>= assertEqual "solution 1" solution1,
                   TestCase $ input >>= part2IO >>= assertEqual "solution 2" solution2
@@ -157,29 +154,26 @@ mkYear' y lookUpDay = mkYear y (runSolution =<< lookUpDay) (TestList $ mkTests <
 inputName :: Day -> String
 inputName d = "AOC" <> show (fromEnum d)
 
-data Solution
-  = PureStringSolution
-      { part1String :: Input -> String,
-        solution1String :: String,
-        part2String :: Input -> String,
-        solution2String :: String
-      }
-  | PureSolution
-      { part1 :: Input -> Int,
-        solution1 :: Int,
-        part2 :: Input -> Int,
-        solution2 :: Int
-      }
-  | IOSolution
-      { part1IO :: Input -> IO Int,
-        solution1 :: Int,
-        part2IO :: Input -> IO Int,
-        solution2 :: Int
-      }
+data Solution where
+  PureSolution ::
+    (Show a, Eq a) =>
+    { part1 :: Input -> a,
+      solution1 :: a,
+      part2 :: Input -> a,
+      solution2 :: a
+    } ->
+    Solution
+  IOSolution ::
+    (Show a, Eq a) =>
+    { part1IO :: Input -> IO a,
+      solution1 :: a,
+      part2IO :: Input -> IO a,
+      solution2 :: a
+    } ->
+    Solution
 
 runSolution :: Solution -> Day -> (IO String, IO String)
 runSolution PureSolution {part1, part2} d = (loadInput d <&> show . part1, loadInput d <&> show . part2)
-runSolution PureStringSolution {part1String, part2String} d = (loadInput d <&> part1String, loadInput d <&> part2String)
 runSolution IOSolution {part1IO, part2IO} d = (show <$> (loadInput d >>= part1IO), show <$> (loadInput d >>= part2IO))
 
 loadInput :: Day -> IO Input

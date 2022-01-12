@@ -1,6 +1,6 @@
 module Y2020.AOC21 where
 
-import AOC (Solution (PureStringSolution))
+import AOC (Solution (PureSolution))
 import Data.Functor ((<&>))
 import Data.List (intercalate, nub, sortBy)
 import qualified Data.Map.Strict as M
@@ -78,4 +78,4 @@ solution2 input =
    in pprint allergenes
 
 solution :: Solution
-solution = PureStringSolution solution1 "1977" solution2 "dpkvsdk,xmmpt,cxjqxbt,drbq,zmzq,mnrjrf,kjgl,rkcpxs"
+solution = PureSolution solution1 "1977" solution2 "dpkvsdk,xmmpt,cxjqxbt,drbq,zmzq,mnrjrf,kjgl,rkcpxs"

@@ -1,6 +1,6 @@
 module Y2015.AOC11 where
 
-import AOC (Solution (PureStringSolution))
+import AOC (Solution (PureSolution))
 import Control.Monad (guard)
 import Data.List (group)
 import Text.Parsec (lower, many1)
@@ -61,4 +61,4 @@ toOneInt :: [Int] -> Int
 toOneInt is = fmap show is |> mconcat |> read
 
 solution :: Solution
-solution = PureStringSolution solution1 "hxbxxyzz" solution2 "hxcaabcc"
+solution = PureSolution solution1 "hxbxxyzz" solution2 "hxcaabcc"
