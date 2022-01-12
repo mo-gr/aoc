@@ -41,9 +41,6 @@ fabricate origin goal currentCost rs = do
   evolution <- choose $ explode origin rs
   fabricate evolution goal (succ currentCost) rs
 
-swap :: (a, b) -> (b, a)
-swap (a, b) = (b, a)
-
 rreverse :: (String, String) -> (String, String)
 rreverse (a, b) = (reverse b, reverse a)
 
