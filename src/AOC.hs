@@ -173,8 +173,8 @@ data Solution where
     Solution
 
 runSolution :: Solution -> Day -> (IO String, IO String)
-runSolution PureSolution {part1, part2} d = (loadInput d <&> show . part1, loadInput d <&> show . part2)
-runSolution IOSolution {part1IO, part2IO} d = (show <$> (loadInput d >>= part1IO), show <$> (loadInput d >>= part2IO))
+runSolution PureSolution {part1, part2} d = (loadInput d <&> part1 <&> show, loadInput d <&> part2 <&> show)
+runSolution IOSolution {part1IO, part2IO} d = (loadInput d >>= part1IO <&> show, loadInput d >>= part2IO <&> show)
 
 loadInput :: Day -> IO Input
 loadInput d = C.readFile $ ("AOC" <> show (fromEnum d)) ++ ".input"
