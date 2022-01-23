@@ -49,40 +49,44 @@ canApply _ _ = True
 spells :: [Spell]
 spells = enumFrom (toEnum 0)
 
+playerNotDead, bossDead :: Fight -> Bool
+playerNotDead (Wizard {..}, _) = hitPoints > 0
+bossDead (_, Boss {..}) = hitPointsBoss <= 0
+
 fight :: Int -> Fight -> [Int]
-wizardAttack, bossAttack :: Int -> Int -> Fight -> [Int]
-fight limitMana = wizardAttack limitMana 0
+fight manaLimit = wizardAttack 0
+  where
+    wizardAttack, bossAttack :: Int -> Fight -> [Int]
+    wizardAttack totalManaCost fighters
+      | totalManaCost > manaLimit = []
+      | otherwise = do
+        let afterDifficulty = applyDifficulty fighters
+        guard $ playerNotDead afterDifficulty
+        let afterEffects = applyEffects afterDifficulty
+        if bossDead afterEffects
+          then pure totalManaCost
+          else do
+            sp <- spells
+            guard $ canApply sp afterEffects
+            let afterSpell = applySpell sp afterEffects
+            if bossDead afterSpell
+              then pure $ totalManaCost + cost sp
+              else bossAttack (totalManaCost + cost sp) afterSpell
+    bossAttack costAcc fighters = do
+      let afterEffects = applyEffects fighters
+      if bossDead afterEffects
+        then pure costAcc
+        else do
+          let afterBossAttack = applyBoss afterEffects
+          guard $ playerNotDead afterBossAttack
+          wizardAttack costAcc afterBossAttack
 
-wizardAttack limitMana costAcc fighters = do
-  guard $ costAcc < limitMana
-  let afterDifficulty@(pl, _) = applyDifficulty fighters
-  guard $ hitPoints pl > 0
-  let afterEffects@(_, bo) = applyEffects afterDifficulty
-  if hitPointsBoss bo <= 0
-    then pure costAcc
-    else do
-      sp <- spells
-      guard $ canApply sp afterEffects
-      let afterSpell@(_, bo') = applySpell afterEffects sp
-      if hitPointsBoss bo' <= 0
-        then pure $ costAcc + cost sp
-        else bossAttack limitMana (costAcc + cost sp) afterSpell
-
-bossAttack limitMana costAcc fighters = do
-  let afterEffects@(_, bo) = applyEffects fighters
-  if hitPointsBoss bo <= 0
-    then pure costAcc
-    else do
-      let afterBossAttack@(pl, _) = applyBoss afterEffects
-      guard $ hitPoints pl > 0
-      wizardAttack limitMana costAcc afterBossAttack
-
-applySpell :: Fight -> Spell -> Fight
-applySpell (pl@Wizard {..}, bo@Boss {..}) sp@MagicMissileSpell = (pl {mana = mana - cost sp}, bo {hitPointsBoss = hitPointsBoss - 4})
-applySpell (pl@Wizard {..}, bo@Boss {..}) sp@DrainSpell = (pl {mana = mana - cost sp, hitPoints = hitPoints + 2}, bo {hitPointsBoss = hitPointsBoss - 2})
-applySpell (pl@Wizard {..}, bo) sp@ShieldSpell = (pl {mana = mana - cost sp, shieldFor = 6}, bo)
-applySpell (pl@Wizard {..}, bo) sp@PoisonSpell = (pl {mana = mana - cost sp}, bo {poisonedFor = 6})
-applySpell (pl@Wizard {..}, bo) sp@RechargeSpell = (pl {mana = mana - cost sp, rechargingFor = 5}, bo)
+applySpell :: Spell -> Fight -> Fight
+applySpell sp@MagicMissileSpell (pl@Wizard {..}, bo@Boss {..}) = (pl {mana = mana - cost sp}, bo {hitPointsBoss = hitPointsBoss - 4})
+applySpell sp@DrainSpell (pl@Wizard {..}, bo@Boss {..}) = (pl {mana = mana - cost sp, hitPoints = hitPoints + 2}, bo {hitPointsBoss = hitPointsBoss - 2})
+applySpell sp@ShieldSpell (pl@Wizard {..}, bo) = (pl {mana = mana - cost sp, shieldFor = 6}, bo)
+applySpell sp@PoisonSpell (pl@Wizard {..}, bo) = (pl {mana = mana - cost sp}, bo {poisonedFor = 6})
+applySpell sp@RechargeSpell (pl@Wizard {..}, bo) = (pl {mana = mana - cost sp, rechargingFor = 5}, bo)
 
 applyBoss :: Fight -> Fight
 applyBoss (pl@Wizard {..}, bo@Boss {..})
