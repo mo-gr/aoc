@@ -13,6 +13,10 @@ negativeNumber :: Parser Int
 negativeNumber = do
   (negate <$> (char '-' *> number)) <|> number
 
+explicitNumber :: Parser Int
+explicitNumber = do
+  (negate <$> (char '-' *> number)) <|> (char '+' *> number)
+
 parseOrDie :: Parser p -> Input -> p
 parseOrDie parser input = case runP parser () "" input of
   Left err -> error $ show err
