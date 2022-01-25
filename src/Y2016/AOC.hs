@@ -1,10 +1,12 @@
 module Y2016.AOC where
-  
+
 import AOC (Day (..), Solution, Year (), mkYear')
 import qualified Y2016.AOC1
+import qualified Y2016.AOC2
 
 lookUpDay :: Day -> Solution
 lookUpDay D1 = Y2016.AOC1.solution
+lookUpDay D2 = Y2016.AOC2.solution
 lookUpDay _ = error "not yet"
 
 year :: Year
