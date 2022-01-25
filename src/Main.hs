@@ -10,6 +10,7 @@ import System.Environment
 import Test.HUnit (runTestTT)
 import Util (safeHead)
 import qualified Y2015.AOC as Y2015 (year)
+import qualified Y2016.AOC as Y2016 (year)
 import qualified Y2019.AOC as Y2019 (year)
 import qualified Y2020.AOC as Y2020 (year)
 import qualified Y2021.AOC as Y2021 (year)
@@ -26,6 +27,7 @@ main = do
   arg <- getArgs
   let year = case arg of
         ("2015" : _) -> Y2015.year
+        ("2016" : _) -> Y2016.year
         ("2019" : _) -> Y2019.year
         ("2020" : _) -> Y2020.year
         _ -> Y2021.year
