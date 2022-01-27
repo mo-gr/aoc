@@ -5,12 +5,14 @@ import qualified Y2016.AOC1
 import qualified Y2016.AOC2
 import qualified Y2016.AOC3
 import qualified Y2016.AOC4
+import qualified Y2016.AOC5
 
 lookUpDay :: Day -> Solution
 lookUpDay D1 = Y2016.AOC1.solution
 lookUpDay D2 = Y2016.AOC2.solution
 lookUpDay D3 = Y2016.AOC3.solution
 lookUpDay D4 = Y2016.AOC4.solution
+lookUpDay D5 = Y2016.AOC5.solution
 lookUpDay _ = error "not yet"
 
 year :: Year
