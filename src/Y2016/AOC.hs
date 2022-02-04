@@ -2,6 +2,7 @@ module Y2016.AOC where
 
 import AOC (Day (..), Solution, Year (), mkYear')
 import qualified Y2016.AOC1
+import qualified Y2016.AOC10
 import qualified Y2016.AOC2
 import qualified Y2016.AOC3
 import qualified Y2016.AOC4
@@ -21,6 +22,7 @@ lookUpDay D6 = Y2016.AOC6.solution
 lookUpDay D7 = Y2016.AOC7.solution
 lookUpDay D8 = Y2016.AOC8.solution
 lookUpDay D9 = Y2016.AOC9.solution
+lookUpDay D10 = Y2016.AOC10.solution
 lookUpDay _ = error "not yet"
 
 year :: Year
