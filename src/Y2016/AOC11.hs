@@ -119,25 +119,42 @@ estimateCost w = error $ "invalid world: " <> showWorld w
 --  | n > 20 = Nothing -- cutoff
 --  | win == world = trace (showWorld world) $ Just n
 --  | otherwise = firstJust $ countMovesTilWinDF (succ n) win (S.insert world previousStates) <$> possibleMoves previousStates world
-countMovesTilWinBF :: (Ord a) => Int -> World a -> S.Set (World a) -> [([World a], World a)] -> Maybe Int
+countMovesTilWinBF :: (Ord a) => Int -> World a -> S.Set (World a) -> [World a] -> Maybe Int
 countMovesTilWinBF n win previousStates worlds
   | traceShowId n > 500 = Nothing -- cutoff
-  | win `elem` fmap snd worlds = trace (concatMap ((<> "\n\n") . showWorld) . fst . head . filter (\w -> snd w == win) $ worlds) $ Just n
+  | win `elem` worlds =  Just n
   | otherwise =
     countMovesTilWinBF
       (succ n)
       win
-      (S.union previousStates (S.fromList (fmap snd worlds)))
-      (onlyMostPromising' (concatMap (possibleMoves previousStates) worlds))
+      (S.union previousStates (S.fromList worlds))
+      (onlyMostPromising (concatMap (possibleMoves previousStates) worlds))
 
---onlyMostPromising :: [World a] -> [World a]
---onlyMostPromising = take 10000 . sortOn estimateCost
-onlyMostPromising' :: [([World a], World a)] -> [([World a], World a)]
-onlyMostPromising' = take 1000000 . sortOn (estimateCost.snd)
+countMovesTilWinDBF :: (Ord a) => Int -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> Maybe Int
+countMovesTilWinDBF n previousStatesB previousStatesE begin end
+  | traceShowId n > 20 = Nothing
+  | not $ S.null (S.intersection begin end) = Just (2*n)
+  | not $ S.null (S.intersection begin previousStatesE) = Just ((2*n) - 1)
+  | not $ S.null (S.intersection end previousStatesB) = Just ((2*n) - 1)
+  | otherwise =
+    countMovesTilWinDBF
+      (succ n)
+      (S.unions [previousStatesB, begin])
+      (S.unions [previousStatesE, end])
+      (S.fromList (concatMap (possibleMoves previousStatesB) (S.toList begin)))
+      (S.fromList (concatMap (possibleMoves previousStatesE) (S.toList end)))
+
+intersections :: Ord a => [S.Set a] -> S.Set a
+intersections [] = S.empty
+intersections [x] = x
+intersections (x:rest) = S.intersection x (intersections rest)
+
+onlyMostPromising :: [World a] -> [World a]
+onlyMostPromising = take 10000 . sortOn estimateCost
 
 countMovesTilWinAStar :: Ord a => World a -> World a -> Maybe Int
 countMovesTilWinAStar win start = length <$> aStar
-    (\w -> S.fromList $ snd <$> possibleMoves S.empty ([],w))
+    (S.fromList . possibleMoves S.empty)
     (\_ _-> 1)
     estimateCost
     (== win)
@@ -151,11 +168,11 @@ firstJust (_ : rst) = firstJust rst
 showWorld :: World a -> String
 showWorld w = mconcat $ reverse . intersperse "\n" $ fmap (show . S.toList) w
 
-possibleMoves :: Ord a => S.Set (World a) -> ([World a], World a) -> [([World a], World a)]
-possibleMoves prev (h, w) =
+possibleMoves :: Ord a => S.Set (World a) -> World a -> [World a]
+possibleMoves prev w =
   let possibleFillings = elevatorFillings <$> w
    in --  fmap (w : h,) . filter (`S.notMember` prev) . filter (all chipsAreSafe) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
-      fmap (h,) . filter (`S.notMember` prev) . filter (all chipsAreSafe) .filter (/= w) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
+      filter (`S.notMember` prev) . filter (all chipsAreSafe) .filter (/= w) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
 
 elevatorUp :: (Ord a) => World a -> [[S.Set (Item a)]] -> [World a]
 elevatorUp world possibleElevatorFillings = applyFillingUp $ zip world possibleElevatorFillings
@@ -192,10 +209,12 @@ elevatorFillings f
 solution1, solution2 :: Input -> Int
 solution2 _input =
   --fromJust $ countMovesTilWinBF 0 winState S.empty [([], setup)]
-  fromJust $ countMovesTilWinBF 0 setup S.empty [([], winState)]
+--  fromJust $ countMovesTilWinBF 0 setup S.empty [winState]
+  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup) (S.singleton winState)
 solution1 _input =
 --  fromJust $ countMovesTilWinBF 0 testWinState S.empty [([], testSetup)]
-  fromJust $ countMovesTilWinBF 0 testSetup S.empty [([], testWinState)]
+--  fromJust $ countMovesTilWinBF 0 testSetup S.empty [testWinState]
+  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton testSetup) (S.singleton testWinState)
 
 solution :: Solution
-solution = PureSolution solution1 undefined solution2 undefined
+solution = PureSolution solution1 37 solution2 undefined
