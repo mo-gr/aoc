@@ -1,9 +1,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TupleSections #-}
 
-module Y2016.AOC11 where
+module Y2016.AOC11 (solution) where
 
 import AOC (Solution (PureSolution))
 import Control.Monad (guard)
@@ -14,7 +13,7 @@ import Debug.Trace
 import Util (Input)
 import AStar (aStar)
 
-data Element = Strontium | Plutonium | Thulium | Ruthenium | Curium
+data Element = Strontium | Plutonium | Thulium | Ruthenium | Curium | Elerium | Dilithium
   deriving (Eq, Ord)
 
 instance Show Element where
@@ -23,6 +22,8 @@ instance Show Element where
   show Thulium = "T"
   show Ruthenium = "R"
   show Curium = "C"
+  show Elerium = "E"
+  show Dilithium = "D"
 
 data TestElement = Hydrogen | Lithium
   deriving (Eq, Ord)
@@ -69,21 +70,35 @@ testSetup4 =
     S.fromList []
   ]
 
-setup :: World Element
+setup, setup2 :: World Element
 setup =
   [ S.fromList [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium],
     S.fromList [Generator Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium],
     S.fromList [Microchip Thulium],
     S.fromList []
   ]
+setup2 =
+  [ S.fromList $ [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium] <> part2Parts,
+    S.fromList [Generator Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium],
+    S.fromList [Microchip Thulium],
+    S.fromList []
+  ]
 
-winState :: World Element
+part2Parts = [Generator Elerium, Microchip Elerium, Generator Dilithium, Microchip Dilithium]
+
+winState, winState2 :: World Element
 winState =
   [ S.empty,
     S.empty,
     S.empty,
     S.fromList [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium, Generator Thulium, Microchip Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium]
   ]
+winState2 =
+    [ S.empty,
+      S.empty,
+      S.empty,
+      S.fromList $ [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium, Generator Thulium, Microchip Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium]  <> part2Parts
+    ]
 
 testWinState :: World TestElement
 testWinState =
@@ -132,7 +147,7 @@ countMovesTilWinBF n win previousStates worlds
 
 countMovesTilWinDBF :: (Ord a) => Int -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> Maybe Int
 countMovesTilWinDBF n previousStatesB previousStatesE begin end
-  | traceShowId n > 20 = Nothing
+  | traceShowId n > 100 = Nothing
   | not $ S.null (S.intersection begin end) = Just (2*n)
   | not $ S.null (S.intersection begin previousStatesE) = Just ((2*n) - 1)
   | not $ S.null (S.intersection end previousStatesB) = Just ((2*n) - 1)
@@ -207,14 +222,11 @@ elevatorFillings f
 
 -- not 42
 solution1, solution2 :: Input -> Int
-solution2 _input =
-  --fromJust $ countMovesTilWinBF 0 winState S.empty [([], setup)]
---  fromJust $ countMovesTilWinBF 0 setup S.empty [winState]
-  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup) (S.singleton winState)
 solution1 _input =
---  fromJust $ countMovesTilWinBF 0 testWinState S.empty [([], testSetup)]
---  fromJust $ countMovesTilWinBF 0 testSetup S.empty [testWinState]
-  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton testSetup) (S.singleton testWinState)
+  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup) (S.singleton winState)
+solution2 _input =
+  fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup2) (S.singleton winState2)
+
 
 solution :: Solution
 solution = PureSolution solution1 37 solution2 undefined
