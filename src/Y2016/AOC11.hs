@@ -6,12 +6,9 @@ module Y2016.AOC11 (solution) where
 
 import AOC (Solution (PureSolution))
 import Control.Monad (guard)
-import Data.List (intersperse, sortOn)
 import Data.Maybe (fromJust)
 import qualified Data.Set as S
-import Debug.Trace
 import Util (Input)
-import AStar (aStar)
 
 data Element = Strontium | Plutonium | Thulium | Ruthenium | Curium | Elerium | Dilithium
   deriving (Eq, Ord)
@@ -24,13 +21,6 @@ instance Show Element where
   show Curium = "C"
   show Elerium = "E"
   show Dilithium = "D"
-
-data TestElement = Hydrogen | Lithium
-  deriving (Eq, Ord)
-
-instance Show TestElement where
-  show Hydrogen = "H"
-  show Lithium = "L"
 
 data Item a where
   Microchip :: Show a => a -> Item a
@@ -50,26 +40,6 @@ type Floor a = S.Set (Item a)
 
 type World a = [Floor a]
 
-testSetup, testSetup3, testSetup4 :: World TestElement
-testSetup =
-  [ S.fromList [Elevator, Microchip Hydrogen, Microchip Lithium],
-    S.fromList [Generator Hydrogen],
-    S.fromList [Generator Lithium],
-    S.fromList []
-  ]
-testSetup3 =
-  [ S.fromList [Microchip Lithium],
-    S.fromList [Elevator, Microchip Hydrogen],
-    S.fromList [Generator Lithium, Generator Hydrogen],
-    S.fromList []
-  ]
-testSetup4 =
-  [ S.fromList [Elevator, Microchip Hydrogen, Microchip Lithium],
-    S.fromList [],
-    S.fromList [Generator Lithium, Generator Hydrogen],
-    S.fromList []
-  ]
-
 setup, setup2 :: World Element
 setup =
   [ S.fromList [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium],
@@ -84,6 +54,7 @@ setup2 =
     S.fromList []
   ]
 
+part2Parts :: [Item Element]
 part2Parts = [Generator Elerium, Microchip Elerium, Generator Dilithium, Microchip Dilithium]
 
 winState, winState2 :: World Element
@@ -94,18 +65,10 @@ winState =
     S.fromList [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium, Generator Thulium, Microchip Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium]
   ]
 winState2 =
-    [ S.empty,
-      S.empty,
-      S.empty,
-      S.fromList $ [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium, Generator Thulium, Microchip Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium]  <> part2Parts
-    ]
-
-testWinState :: World TestElement
-testWinState =
   [ S.empty,
     S.empty,
     S.empty,
-    S.fromList [Elevator, Microchip Hydrogen, Microchip Lithium, Generator Hydrogen, Generator Lithium]
+    S.fromList $ [Elevator, Generator Strontium, Microchip Strontium, Generator Plutonium, Microchip Plutonium, Generator Thulium, Microchip Thulium, Generator Ruthenium, Microchip Ruthenium, Generator Curium, Microchip Curium] <> part2Parts
   ]
 
 chipsAreSafe :: Ord a => Floor a -> Bool
@@ -125,32 +88,12 @@ noGenerator f = go $ S.toList f
     go (Generator _ : _) = False
     go (_ : rst) = go rst
 
-estimateCost :: World a -> Int
-estimateCost [l1, l2, l3, _l4] = length l1 * 3 + length l2 * 2 + length l3
-estimateCost w = error $ "invalid world: " <> showWorld w
-
---countMovesTilWinDF :: (Ord a) =>  Int -> World a -> S.Set (World a) -> World a -> Maybe Int
---countMovesTilWinDF n win previousStates world
---  | n > 20 = Nothing -- cutoff
---  | win == world = trace (showWorld world) $ Just n
---  | otherwise = firstJust $ countMovesTilWinDF (succ n) win (S.insert world previousStates) <$> possibleMoves previousStates world
-countMovesTilWinBF :: (Ord a) => Int -> World a -> S.Set (World a) -> [World a] -> Maybe Int
-countMovesTilWinBF n win previousStates worlds
-  | traceShowId n > 500 = Nothing -- cutoff
-  | win `elem` worlds =  Just n
-  | otherwise =
-    countMovesTilWinBF
-      (succ n)
-      win
-      (S.union previousStates (S.fromList worlds))
-      (onlyMostPromising (concatMap (possibleMoves previousStates) worlds))
-
 countMovesTilWinDBF :: (Ord a) => Int -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> S.Set (World a) -> Maybe Int
 countMovesTilWinDBF n previousStatesB previousStatesE begin end
-  | traceShowId n > 100 = Nothing
-  | not $ S.null (S.intersection begin end) = Just (2*n)
-  | not $ S.null (S.intersection begin previousStatesE) = Just ((2*n) - 1)
-  | not $ S.null (S.intersection end previousStatesB) = Just ((2*n) - 1)
+  | n > 100 = Nothing
+  | not $ S.null (S.intersection begin end) = Just (2 * n)
+  | not $ S.null (S.intersection begin previousStatesE) = Just ((2 * n) - 1)
+  | not $ S.null (S.intersection end previousStatesB) = Just ((2 * n) - 1)
   | otherwise =
     countMovesTilWinDBF
       (succ n)
@@ -159,35 +102,11 @@ countMovesTilWinDBF n previousStatesB previousStatesE begin end
       (S.fromList (concatMap (possibleMoves previousStatesB) (S.toList begin)))
       (S.fromList (concatMap (possibleMoves previousStatesE) (S.toList end)))
 
-intersections :: Ord a => [S.Set a] -> S.Set a
-intersections [] = S.empty
-intersections [x] = x
-intersections (x:rest) = S.intersection x (intersections rest)
-
-onlyMostPromising :: [World a] -> [World a]
-onlyMostPromising = take 10000 . sortOn estimateCost
-
-countMovesTilWinAStar :: Ord a => World a -> World a -> Maybe Int
-countMovesTilWinAStar win start = length <$> aStar
-    (S.fromList . possibleMoves S.empty)
-    (\_ _-> 1)
-    estimateCost
-    (== win)
-    start
-
-firstJust :: [Maybe a] -> Maybe a
-firstJust [] = Nothing
-firstJust ((Just a) : _) = Just a
-firstJust (_ : rst) = firstJust rst
-
-showWorld :: World a -> String
-showWorld w = mconcat $ reverse . intersperse "\n" $ fmap (show . S.toList) w
-
 possibleMoves :: Ord a => S.Set (World a) -> World a -> [World a]
 possibleMoves prev w =
   let possibleFillings = elevatorFillings <$> w
    in --  fmap (w : h,) . filter (`S.notMember` prev) . filter (all chipsAreSafe) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
-      filter (`S.notMember` prev) . filter (all chipsAreSafe) .filter (/= w) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
+      filter (`S.notMember` prev) . filter (all chipsAreSafe) . filter (/= w) $ (elevatorUp w possibleFillings <> elevatorDown w possibleFillings)
 
 elevatorUp :: (Ord a) => World a -> [[S.Set (Item a)]] -> [World a]
 elevatorUp world possibleElevatorFillings = applyFillingUp $ zip world possibleElevatorFillings
@@ -220,13 +139,12 @@ elevatorFillings f
     guard $ y /= Elevator
     S.fromList <$> [[Elevator, x, y], [Elevator, x], [Elevator, y]]
 
--- not 42
+-- 37, 61
 solution1, solution2 :: Input -> Int
 solution1 _input =
   fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup) (S.singleton winState)
 solution2 _input =
   fromJust $ countMovesTilWinDBF 0 S.empty S.empty (S.singleton setup2) (S.singleton winState2)
 
-
 solution :: Solution
-solution = PureSolution solution1 37 solution2 undefined
+solution = PureSolution solution1 37 solution2 61
