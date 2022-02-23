@@ -7,6 +7,7 @@ import qualified Y2016.AOC11
 import qualified Y2016.AOC12
 import qualified Y2016.AOC13
 import qualified Y2016.AOC14
+import qualified Y2016.AOC15
 import qualified Y2016.AOC2
 import qualified Y2016.AOC3
 import qualified Y2016.AOC4
@@ -31,6 +32,7 @@ lookUpDay D11 = Y2016.AOC11.solution
 lookUpDay D12 = Y2016.AOC12.solution
 lookUpDay D13 = Y2016.AOC13.solution
 lookUpDay D14 = Y2016.AOC14.solution
+lookUpDay D15 = Y2016.AOC15.solution
 lookUpDay _ = error "not yet"
 
 year :: Year
