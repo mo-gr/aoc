@@ -16,6 +16,7 @@ dependencies:
 - hashing
 - json
 - apecs
+- parallel
 executables:
   AOC:
     main: Main.hs
