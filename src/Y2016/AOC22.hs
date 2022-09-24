@@ -1,6 +1,4 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections #-}
 
 module Y2016.AOC22 (solution) where
 
@@ -9,7 +7,6 @@ import AStar (aStar)
 import Control.Monad (guard)
 import Data.List (sortOn)
 import qualified Data.Set as S
-import Debug.Trace (traceShow, traceShowId)
 import Text.Parsec (many1, newline, space, string)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -44,20 +41,10 @@ pairs ns = do
   guard $ used a < avail b
   pure (a, b)
 
-validMoves :: [Node] -> [(Node, Node)]
---validMoves ns = pairs ns |> filter nodesAreNeighbours
-validMoves ns = findEmptyNode ns |> \empty -> (, empty) <$> filter (nodesAreNeighbours empty) ns
-
-nodesAreNeighbours :: Node -> Node -> Bool
+nodesAreNeighbours :: Point -> Point -> Bool
 nodesAreNeighbours n n'
   | manhatten n n' == 1 = True
   | otherwise = False
-
-applyMove :: [Node] -> (Node, Node) -> [Node]
-applyMove [] _ = []
-applyMove (n : ns) m@(from, _to) | pos n == pos from = n {used = 0, avail = size n} : applyMove ns m
-applyMove (n : ns) m@(from, to) | pos n == pos to = n {used = used n + used from, avail = avail n - used from} : applyMove ns m
-applyMove (n : ns) m = n : applyMove ns m
 
 findTargetData :: [Node] -> Node
 findTargetData = last . filter ((== 0) . snd . pos) . sortOn (fst . pos)
@@ -65,59 +52,34 @@ findTargetData = last . filter ((== 0) . snd . pos) . sortOn (fst . pos)
 findEmptyNode :: [Node] -> Node
 findEmptyNode = last . sortOn avail
 
-updateTarget :: Node -> (Node, Node) -> Node
-updateTarget t (from, to)
-  | pos t == pos from = to
-  | otherwise = t
-
-bfsToGetTarget :: [Node] -> Int
-bfsToGetTarget startNodes = go 0 S.empty [(startNodes, findTargetData startNodes)]
-  where
-    go :: Int -> S.Set ([Node], Node) -> [([Node], Node)] -> Int
-    go _ _ [] = error "no path"
-    go !n !pastStates !state
-      | any (\(_, t) -> pos t == (0, 0)) state = n
-      | otherwise =
-        go (succ (traceShowId n)) (S.union pastStates (S.fromList state)) $ do
-          (nodes, target) <- state
-          move <- validMoves nodes
-          let afterMove = applyMove nodes move
-          let newTarget = updateTarget target move
-          guard $ S.notMember (afterMove, newTarget) pastStates
-          [(afterMove, newTarget)]
-
-originIsEmpty :: [Node] -> (Node, Node) -> Bool
-originIsEmpty ns (f, _)
-  | findEmptyNode ns == f = True
-  | otherwise = False
-
-aStarToTarget :: [Node] -> Int
-aStarToTarget startNodes = case aStar
-  (\(ns, t) -> S.fromList $ (\m -> (applyMove ns m, updateTarget t m)) <$> validMoves ns)
-  (\_ _ -> 1)
-  (\(ns, t) -> manhatten t (findEmptyNode ns))
-  (\(ns, t) -> pos t == pos (findTargetData ns))
-  (startNodes, findEmptyNode startNodes) of
-  Just p -> length $ traceShow (fmap snd p) p
-  _ -> error "no path"
-
-aStarToTarget' :: [Node] -> Int
-aStarToTarget' startNodes =
-  let target = traceShowId $ findTargetData startNodes
-   in case aStar
-        (\ns -> S.fromList $ applyMove ns <$> validMoves ns)
-        (\_ _ -> 1)
-        (\ns -> manhatten (findEmptyNode ns) target)
-        (\ns -> manhatten (findEmptyNode ns) target == 0)
-        startNodes of
-        Just p -> length $ traceShow (fmap findEmptyNode ([startNodes]<>p)) p
+aStarFromTo :: [Point] -> Point -> Point -> Int
+aStarFromTo nodes from target =
+  let graph n = filter (nodesAreNeighbours n) nodes |> S.fromList
+      distance _ _ = 1
+      heuristic n = manhatten n target
+      goal n = target == n
+   in case aStar graph distance heuristic goal from of
+        Just p -> length p
         _ -> error "no path"
 
-manhatten00 :: Node -> Int
-manhatten00 n = manhatten n (Node (0, 0) 0 0 0)
+manhatten :: Point -> Point -> Int
+manhatten (x, y) (x', y') = abs (x - x') + abs (y - y')
 
-manhatten :: Node -> Node -> Int
-manhatten n n' = (pos n, pos n') |> (\((x, y), (x', y')) -> abs (x - x') + abs (y - y'))
+validPos :: [Node] -> [Point]
+validPos nodes = filter ((< 100) . size) nodes |> fmap pos
+
+oneBefore :: Point -> Point
+oneBefore (x, y) = (pred x, y)
+
+solvePuzzle :: [Node] -> Int
+solvePuzzle nodes =
+  let emptyNodePos = findEmptyNode nodes |> pos
+      targetPos = findTargetData nodes |> pos
+      costToMoveEmptyNextToGoal = aStarFromTo (validPos nodes) emptyNodePos (oneBefore targetPos)
+      costToMoveGoalByOne = 5
+      distanceToMoveGoal = aStarFromTo (validPos nodes) targetPos (1, 0)
+      finalMoveCost = 1
+   in costToMoveEmptyNextToGoal + (costToMoveGoalByOne * distanceToMoveGoal) + finalMoveCost
 
 -- 987
 solution1 :: Input -> Int
@@ -126,24 +88,11 @@ solution1 input =
     |> pairs
     |> length
 
--- too low 219
+-- 220
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-    |> \ns ->
-      traceShow (findEmptyNode ns) ns
-        |> \ns ->
-          traceShow (findTargetData ns) ns
-            |> \ns ->
-              traceShow (manhatten (findTargetData ns) (findEmptyNode ns)) ns
-                |> \ns ->
-                  traceShow (manhatten00 (findTargetData ns)) ns
-                    |> \ns ->
-                      traceShow ((manhatten00 (findTargetData ns) * 5) + manhatten (findTargetData ns) (findEmptyNode ns)) ns
-                        |> aStarToTarget
+    |> solvePuzzle
 
 solution :: Solution
-solution = PureSolution solution1 987 solution2 undefined
-
-testData :: Input
-testData = "root@ebhq-gridcenter# df -h\nFilesystem              Size  Used  Avail  Use%\n/dev/grid/node-x0-y0   10T    8T     2T   80%\n/dev/grid/node-x0-y1   11T    6T     5T   54%\n/dev/grid/node-x0-y2   32T   28T     4T   87%\n/dev/grid/node-x1-y0    9T    7T     2T   77%\n/dev/grid/node-x1-y1    8T    0T     8T    0%\n/dev/grid/node-x1-y2   11T    7T     4T   63%\n/dev/grid/node-x2-y0   10T    6T     4T   60%\n/dev/grid/node-x2-y1    9T    8T     1T   88%\n/dev/grid/node-x2-y2    9T    6T     3T   66%\n"
+solution = PureSolution solution1 987 solution2 220
