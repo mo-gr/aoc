@@ -6,6 +6,8 @@ import qualified Data.Map.Strict as Map
 import Data.Map.Strict (Map, (!))
 import Control.Monad (foldM)
 import Control.Monad.Identity (runIdentity)
+import Util ((|>))
+import Data.List (sortOn)
 
 data AStar a c = AStar { visited  :: !(Set a),
                          waiting  :: !(Map a c),
@@ -49,7 +51,7 @@ runAStarM :: (Monad m, Ord a, Ord c, Num c) =>
 
 runAStarM graph dist heur goal start = aStar' (aStarInit start)
   where aStar' s
-          = case Map.minViewWithKey (waiting s) of
+          = case minValueViewWithKey (waiting s) of
               Nothing            -> return s
               Just ((x,_), w') ->
                 do g <- goal x
@@ -93,3 +95,8 @@ aStarM graph dist heur goal start
          return $ case end s of
                     Nothing -> Nothing
                     Just e  -> Just (reverse . takeWhile (/= sv) . iterate (cameFrom s !) $ e)
+
+
+minValueViewWithKey :: (Ord a, Ord k) => Map k a -> Maybe ((k, a), Map k a)
+minValueViewWithKey it | Map.null it = Nothing
+ | otherwise = Map.assocs it |> sortOn snd |> head |> \minAssoc -> Just (minAssoc, Map.delete (fst minAssoc) it)  
