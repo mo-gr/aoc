@@ -8,6 +8,8 @@ import Util (Input, parseOrDie, (|>))
 import qualified Data.Set as S
 import Text.Parsec (many1, char, newline, statePos, getParserState, sourceColumn, sourceLine, digit)
 import Control.Applicative ((<|>))
+import AStar (aStar)
+import Data.List (permutations)
 
 type Point = (Int, Int)
 
@@ -34,10 +36,36 @@ inputParser =  mconcat <$> do
         '0' -> World (sourceColumn sp, sourceLine sp) [] $ S.singleton (sourceColumn sp, sourceLine sp)
         _ -> World (0,0) [(sourceColumn sp, sourceLine sp)] $ S.singleton (sourceColumn sp, sourceLine sp)
 
+manhatten :: Point -> Point -> Int
+manhatten (x, y) (x', y') = abs (x - x') + abs (y - y')
+
+neighbours :: S.Set Point -> Point -> S.Set Point
+neighbours world (x,y) = S.intersection world $ S.fromList [(pred x, y), (x, pred y), (succ x, y), (x, succ y)]
+
+pathFromTo :: S.Set Point -> Point -> Point -> [Point]
+pathFromTo worldMap from to = case aStar graph dist heur goal from of
+    Just path -> path
+    Nothing -> error "no path"
+  where
+    graph n = neighbours worldMap n
+    dist _ _ = 1
+    heur n = manhatten n to
+    goal n = n == to
+
+totalPath :: S.Set Point -> [Point] -> [Point]
+totalPath _ [] = []
+totalPath _ [_] = [] -- only one point left, no where to go
+totalPath worldMap (f:t:rest) = pathFromTo worldMap f t <> totalPath worldMap (t:rest)
+
+solve :: World -> Int
+solve (World s goals worldMap) = minimum $ length <$> do
+    goalPerm <- permutations goals
+    [totalPath worldMap (s:goalPerm)]    
+
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
-    |> undefined
+    |> solve
 
 solution2 :: Input -> Int
 solution2 input =
