@@ -1,4 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TupleSections #-}
 
 module Y2016.AOC25 where
 
@@ -9,7 +12,8 @@ import Text.Parsec (many1, newline, char, try, string)
 import Data.Foldable (asum)
 import Data.Functor (($>), (<&>))
 import Control.Applicative ((<|>))
-import Debug.Trace (traceShow)
+import Debug.Trace
+import Data.Maybe (catMaybes)
 
 data Assembunny a = Assembunny
   { regA :: a,
@@ -17,6 +21,7 @@ data Assembunny a = Assembunny
     regC :: a,
     regD :: a,
     pc :: Int,
+    output :: [Int],
     program :: [Instruction a]
   }
 
@@ -24,7 +29,7 @@ data Operand a = RegA | RegB | RegC | RegD | Value a
   deriving (Show)
 
 instance Show a => Show (Assembunny a) where
-  show b = show (pc b) <> ":" <> show (program b)
+  show b = show (pc b) <> ":" <> show (output b)
 
 writePc :: Int -> Assembunny Int -> Assembunny Int
 writePc v b = b {pc = v}
@@ -53,7 +58,7 @@ data Instruction a
   deriving (Show)
 
 mkBunny :: [Instruction Int] -> Assembunny Int
-mkBunny = Assembunny 0 0 0 0 0
+mkBunny = Assembunny 0 0 0 0 0 []
 
 inputParser :: Parser [Instruction Int]
 inputParser = many1 (instructionP <* newline)
@@ -86,10 +91,20 @@ safeIndex a as
   | a >= length as = Nothing
   | otherwise = Just $ as !! a
 
-runTilHalt :: Int -> Assembunny Int -> Assembunny Int
-runTilHalt 0 _ = error "no result"
+hasInvalidOutput :: Assembunny Int -> Bool
+hasInvalidOutput Assembunny {output} = not $  isValid output
+  where
+    isValid [] = True
+    isValid [0] = True
+    isValid (1:0:rest) = isValid (0:rest)
+    isValid (0:1:rest) = isValid (1:rest)
+    isValid _ = False
+
+runTilHalt :: Int -> Assembunny Int -> Maybe (Assembunny Int)
+runTilHalt 0 b = Just b
+runTilHalt _ b | hasInvalidOutput b = Nothing
 runTilHalt limit bunny = case drop (pc bunny) (program bunny) of
-  [] -> bunny
+  [] -> Nothing -- programm ended, so it doesn't produce infinite signal
   instr : _ -> eval instr bunny |> runTilHalt (pred limit)
 
 eval :: Instruction Int -> Assembunny Int -> Assembunny Int
@@ -100,18 +115,22 @@ eval (Jnz cnd j) b = case readOp cnd b of
   0 -> nextPc b
   _ -> writePc (pc b + readOp j b) b
 eval Noop b = nextPc b
-eval (Out r) b = traceShow (readOp r b) b |> nextPc
+eval (Out r) b = b {output = readOp r b:output b} |> nextPc
 
 
 nextPc :: Assembunny Int -> Assembunny Int
 nextPc b = b {pc = succ $ pc b}
 
+-- 192
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
     |> mkBunny
-    |> runTilHalt 100000000
-    |> regA 
+    |> \b -> fmap (\startA -> b {regA = startA} |> runTilHalt 10000000 |> fmap (startA,)) [0..1000]
+    |> catMaybes
+    |> \case
+          (x:_) -> fst x
+          _ -> -1
 
 solution2 :: Input -> Int
 solution2 input =
@@ -119,7 +138,7 @@ solution2 input =
     |> undefined
 
 solution :: Solution
-solution = PureSolution solution1 undefined solution2 undefined
+solution = PureSolution solution1 192 solution2 undefined
 
 testData :: Input
 testData = "cpy 1 a\ncpy 1 b\ncpy 26 d\njnz c 2\njnz 1 5\ncpy 7 c\ninc d\ndec c\njnz c -2\ncpy a c\ninc a\ndec b\njnz b -2\ncpy c b\ndec d\njnz d -6\ncpy 16 c\ncpy 17 d\ninc a\ndec d\njnz d -2\ndec c\njnz c -5\n"
