@@ -1,19 +1,18 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 
 module Y2016.AOC25 where
 
 import AOC (Solution (PureSolution))
-import Text.Parsec.ByteString (Parser)
-import Util (Input, parseOrDie, (|>), negativeNumber)
-import Text.Parsec (many1, newline, char, try, string)
+import Control.Applicative ((<|>))
 import Data.Foldable (asum)
 import Data.Functor (($>), (<&>))
-import Control.Applicative ((<|>))
-import Debug.Trace
 import Data.Maybe (catMaybes)
+import Text.Parsec (char, many1, newline, string, try)
+import Text.Parsec.ByteString (Parser)
+import Util (Input, negativeNumber, parseOrDie, (|>))
 
 data Assembunny a = Assembunny
   { regA :: a,
@@ -92,12 +91,12 @@ safeIndex a as
   | otherwise = Just $ as !! a
 
 hasInvalidOutput :: Assembunny Int -> Bool
-hasInvalidOutput Assembunny {output} = not $  isValid output
+hasInvalidOutput Assembunny {output} = not $ isValid output
   where
     isValid [] = True
     isValid [0] = True
-    isValid (1:0:rest) = isValid (0:rest)
-    isValid (0:1:rest) = isValid (1:rest)
+    isValid (1 : 0 : rest) = isValid (0 : rest)
+    isValid (0 : 1 : rest) = isValid (1 : rest)
     isValid _ = False
 
 runTilHalt :: Int -> Assembunny Int -> Maybe (Assembunny Int)
@@ -115,8 +114,7 @@ eval (Jnz cnd j) b = case readOp cnd b of
   0 -> nextPc b
   _ -> writePc (pc b + readOp j b) b
 eval Noop b = nextPc b
-eval (Out r) b = b {output = readOp r b:output b} |> nextPc
-
+eval (Out r) b = b {output = readOp r b : output b} |> nextPc
 
 nextPc :: Assembunny Int -> Assembunny Int
 nextPc b = b {pc = succ $ pc b}
@@ -126,19 +124,17 @@ solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
     |> mkBunny
-    |> \b -> fmap (\startA -> b {regA = startA} |> runTilHalt 10000000 |> fmap (startA,)) [0..1000]
-    |> catMaybes
-    |> \case
-          (x:_) -> fst x
+    |> \b ->
+      fmap (\startA -> b {regA = startA} |> runTilHalt 10000000 |> fmap (startA,)) [0 .. 1000]
+        |> catMaybes
+        |> \case
+          (x : _) -> fst x
           _ -> -1
 
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-    |> undefined
+    |> const 0
 
 solution :: Solution
-solution = PureSolution solution1 192 solution2 undefined
-
-testData :: Input
-testData = "cpy 1 a\ncpy 1 b\ncpy 26 d\njnz c 2\njnz 1 5\ncpy 7 c\ninc d\ndec c\njnz c -2\ncpy a c\ninc a\ndec b\njnz b -2\ncpy c b\ndec d\njnz d -6\ncpy 16 c\ncpy 17 d\ninc a\ndec d\njnz d -2\ndec c\njnz c -5\n"
+solution = PureSolution solution1 192 solution2 0
