@@ -1,0 +1,11 @@
+module Y2017.AOC where
+
+import AOC (Day (..), Solution, Year (), mkYear')
+import qualified Y2017.AOC1
+
+lookUpDay :: Day -> Solution
+lookUpDay D1 = Y2017.AOC1.solution
+lookUpDay _ = error "nothing yet"
+
+year :: Year
+year = mkYear' "2017" lookUpDay
