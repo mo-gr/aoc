@@ -3,17 +3,18 @@
 module Y2017.AOC9 where
 
 import AOC (Solution (PureSolution))
+import Data.Functor (($>), (<&>))
+import Data.Maybe (catMaybes)
+import Text.Parsec (anyChar, char, choice, many, newline, noneOf, sepBy, (<|>))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>))
-import Text.Parsec (newline, char, many, (<|>), choice, noneOf, sepBy, anyChar)
-import Data.Functor (($>))
-import Data.Maybe (catMaybes)
 
-newtype Group = Group [Group]
+data Group = Group [Group] | Garbage Int
 
 instance Show Group where
+  show (Garbage _) = ""
   show (Group []) = "{}"
-  show (Group gs) = "{" <> concatMap show gs  <> "}"
+  show (Group gs) = "{" <> concatMap show gs <> "}"
 
 inputParser :: Parser Group
 inputParser = groupParser <* newline
@@ -21,25 +22,33 @@ inputParser = groupParser <* newline
 groupParser :: Parser Group
 groupParser = do
   _ <- char '{'
-  nested <- nestedGroupsParser
+  nested <- choice [groupParser, trashParser] `sepBy` char ','
   _ <- char '}'
   pure $ Group nested
 
-nestedGroupsParser :: Parser [Group]
-nestedGroupsParser = do
-  catMaybes <$> sepBy (choice [Just <$> groupParser, trashParser $> Nothing]) (char ',')
-
-trashParser :: Parser ()
+trashParser :: Parser Group
 trashParser = do
   _ <- char '<'
-  _ <- many $ (char '!' *> anyChar) <|> noneOf ">"
+  g <-
+    catMaybes
+      <$> many (escapedParser <|> (innerTrashParser <&> Just))
   _ <- char '>'
-  pure ()
+  pure $ Garbage (length g)
 
+escapedParser :: Parser (Maybe Char)
+escapedParser = char '!' *> anyChar $> Nothing
 
-score :: Int ->  Group -> Int
+innerTrashParser :: Parser Char
+innerTrashParser = noneOf ">"
+
+score :: Int -> Group -> Int
+score _ (Garbage _) = 0
 score base (Group []) = base
-score base (Group gs) = base + sum (fmap (score (succ base)) gs) 
+score base (Group gs) = base + sum (fmap (score (succ base)) gs)
+
+garbage :: Group -> Int
+garbage (Garbage g) = g
+garbage (Group gs) = sum (fmap garbage gs)
 
 -- 16827
 solution1 :: Input -> Int
@@ -50,11 +59,8 @@ solution1 input =
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-    |> undefined
+    |> garbage
 
+-- 7298
 solution :: Solution
-solution = PureSolution solution1 16827 solution2 undefined
-
-testData :: Input
-testData = "{{<!!>},{<!!>},{<!!>},{<!!>}}\n"
---testData = "{{<!>},{<!>},{<!>},{<a>}}\n"
+solution = PureSolution solution1 16827 solution2 7298
