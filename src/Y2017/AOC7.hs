@@ -5,7 +5,7 @@ module Y2017.AOC7 where
 import AOC (Solution (PureSolution))
 import Control.Applicative (liftA2, (<|>))
 import Data.List (sortOn)
-import Data.Tree
+import Data.Tree (Tree, rootLabel, subForest, unfoldTree)
 import Text.Parsec (letter, many1, newline, sepBy, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
@@ -16,7 +16,7 @@ data Program = Program
   }
   deriving (Show, Eq)
 
-type ProgramInput = (String, Int, [String])
+type ProgramInput = (Program, [String])
 
 inputParser :: Parser [ProgramInput]
 inputParser = many1 $ do
@@ -24,29 +24,27 @@ inputParser = many1 $ do
   wght <- string " (" *> number <* string ")"
   blnc <- try (string " -> " *> (many1 letter `sepBy` string ", ")) <|> pure []
   _ <- newline
-  pure (nme, wght, blnc)
+  pure (Program nme wght, blnc)
 
 toProgram :: [ProgramInput] -> Tree Program
 toProgram pis = unfoldTree f (findRoot pis)
   where
     f :: ProgramInput -> (Program, [ProgramInput])
-    f (n, w, bs) = (Program n w, filter (byName bs) pis)
-    byName names (nme, _, _) = nme `elem` names
+    f (p, bs) = (p, filter (byName bs) pis)
+    byName names (p, _) = name p `elem` names
     discs :: [String]
-    discs = concatMap (\(_, _, bs) -> bs) pis
+    discs = concatMap snd pis
     findRoot :: [ProgramInput] -> ProgramInput
-    findRoot = head . filter (\(n, _, _) -> n `notElem` discs)
+    findRoot = head . filter (\(p, _) -> name p `notElem` discs)
 
-treeWeight :: Tree Program -> Int
-treeWeight t = rootLabel t |> weight
+selfWeight :: Tree Program -> Int
+selfWeight = weight . rootLabel
 
 totalWeight :: Tree Program -> Int
-totalWeight tr = (weight . rootLabel $ tr) + (sum . discWeights $ tr)
+totalWeight = liftA2 (+) selfWeight (sum . discWeights)
 
 discWeights :: Tree Program -> [Int]
-discWeights tr = case subForest tr of
-  [] -> []
-  disc -> fmap (\t -> treeWeight t + sum (discWeights t)) disc
+discWeights = fmap totalWeight . subForest
 
 balanceWeight :: Tree Program -> Int
 balanceWeight t = discWeights t |> liftA2 (-) maximum minimum
@@ -56,24 +54,18 @@ isBalanced tr | null (subForest tr) = True
 isBalanced tr = balanceWeight tr == 0
 
 unbalanced :: Tree Program -> [Tree Program]
-unbalanced tr | balanceWeight tr == 0 = []
-unbalanced tr =
-  if subForest tr |> fmap isBalanced |> and
-    then subForest tr
-    else subForest tr |> concatMap unbalanced
+unbalanced tr
+  | balanceWeight tr == 0 = []
+  | all isBalanced (subForest tr) = subForest tr
+  | otherwise = concatMap unbalanced (subForest tr)
 
 balance :: Tree Program -> Int
 balance tr =
-  let bw = balanceWeight tr
-      unb = unbalanced tr
-   in case unb of
-        [] -> error "tree balanced"
-        unbtr ->
-          fmap (\t -> (weight . rootLabel $ t, totalWeight t)) unbtr
-            |> sortOn snd
-            |> last
-            |> fst
-            |> subtract bw
+  fmap (liftA2 (,) selfWeight totalWeight) (unbalanced tr)
+    |> sortOn snd
+    |> last
+    |> fst
+    |> subtract (balanceWeight tr)
 
 -- xegshds
 solution1 :: Input -> String
@@ -93,6 +85,3 @@ solution2 input =
 
 solution :: Solution
 solution = PureSolution solution1 "xegshds" solution2 "299"
-
-testData :: Input
-testData = "pbga (66)\nxhth (57)\nebii (61)\nhavc (66)\nktlj (57)\nfwft (72) -> ktlj, cntj, xhth\nqoyq (66)\npadx (45) -> pbga, havc, qoyq\ntknk (41) -> ugml, padx, fwft\njptl (61)\nugml (68) -> gyxo, ebii, jptl\ngyxo (61)\ncntj (57)\n"
