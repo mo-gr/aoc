@@ -95,6 +95,3 @@ solution2 input =
 
 solution :: Solution
 solution = PureSolution solution1 4902 solution2 7037
-
-testData :: Input
-testData = "b inc 5 if a > 1\na inc 1 if b < 5\nc dec -10 if a >= 1\nc inc -20 if c == 10\n"
