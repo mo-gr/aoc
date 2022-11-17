@@ -3,14 +3,13 @@
 module Y2017.AOC10 where
 
 import AOC (Solution (PureSolution))
+import Data.Bits (xor)
+import Data.ByteString.Char8 (unpack)
+import Data.Word (Word8)
+import Numeric (showHex)
 import Text.Parsec (char, newline, sepBy1)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
-import Data.Word (Word8)
-import Data.ByteString.Char8 (unpack)
-import Data.Bits (xor)
-import Numeric (showHex)
-import Data.ByteString.Builder (word8Hex, toLazyByteString)
 
 data Ring = Ring
   { _elems :: [Word8],
@@ -19,9 +18,6 @@ data Ring = Ring
     _length :: Word8
   }
   deriving (Show)
-
-resetElems :: Ring -> Ring
-resetElems r = r {_elems = [0 .. (_length r)]}
 
 mkRing :: Word8 -> Ring
 mkRing n = Ring [0 .. n] 0 0 n
@@ -48,10 +44,11 @@ solution1 input =
     |> checksum
     |> show
 
--- not df54109670266eb8273d17a5564bf3cb
+-- e1a65bfb5a5ce396025fab5528c25a87
 solution2 :: Input -> String
 solution2 input =
   toAscii input
+    |> filter (/= 10) -- drop newline
     |> addSuffix
     |> rounds 64 (mkRing 255)
     |> _elems
@@ -59,19 +56,13 @@ solution2 input =
     |> toHex
 
 solution :: Solution
-solution = PureSolution solution1 "23874" solution2 undefined
-
-testData :: Input
-testData = "AoC 2017"
+solution = PureSolution solution1 "23874" solution2 "e1a65bfb5a5ce396025fab5528c25a87"
 
 toAscii :: Input -> [Int]
 toAscii = fmap fromEnum . unpack
 
 addSuffix :: [Int] -> [Int]
 addSuffix xs = xs <> [17, 31, 73, 47, 23]
-
-toWord8 :: [Int] -> [Word8]
-toWord8 = fmap toEnum
 
 sparseToDense :: [Word8] -> [Word8]
 sparseToDense [] = []
@@ -81,10 +72,9 @@ toHex :: [Word8] -> String
 toHex = concatMap (pad . (`showHex` ""))
 
 pad :: String -> String
-pad [x] = '0':[x]
+pad [x] = '0' : [x]
 pad x = x
 
 rounds :: Int -> Ring -> [Int] -> Ring
 rounds 0 r _ = r
-rounds n r input = rounds (pred n) (foldl step (resetElems r) input) input
-
+rounds n r input = rounds (pred n) (foldl step r input) input
