@@ -49,11 +49,11 @@ solution2 :: Input -> String
 solution2 input =
   toAscii input
     |> filter (/= 10) -- drop newline
-    |> addSuffix
-    |> rounds 64 (mkRing 255)
-    |> _elems
-    |> sparseToDense
+    |> knotHash
     |> toHex
+
+knotHash :: [Int] -> [Word8]
+knotHash input = addSuffix input |> rounds 64 (mkRing 255) |> _elems |> sparseToDense 
 
 solution :: Solution
 solution = PureSolution solution1 "23874" solution2 "e1a65bfb5a5ce396025fab5528c25a87"
