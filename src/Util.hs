@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Util where
 
 import qualified Data.ByteString.Char8 as C
@@ -32,4 +34,4 @@ infixl 8 |>
 
 times :: Int -> (a -> a) -> a -> a
 times 0 _ a = a
-times n f a = times (n - 1) f (f a)
+times !n f !a = times (n - 1) f (f a)

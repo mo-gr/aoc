@@ -10,7 +10,7 @@ import Data.Functor ((<&>))
 import qualified Data.Set as S
 import Text.Parsec (char, letter, newline, sepBy1)
 import Text.Parsec.ByteString (Parser)
-import Util (Input, number, parseOrDie, (|>))
+import Util (Input, number, parseOrDie, (|>), times)
 
 type Program = Char
 
@@ -63,10 +63,6 @@ findLoop f = go S.empty
        in if S.member a' prev
             then length prev
             else go (S.insert a' prev) a'
-
-times :: Int -> (a -> a) -> a -> a
-times 0 _ a = a
-times n f a = times (pred n) f (f a)
 
 -- dcmlhejnifpokgba
 solution1 :: Input -> String
