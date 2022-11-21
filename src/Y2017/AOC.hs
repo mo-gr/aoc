@@ -16,6 +16,7 @@ import qualified Y2017.AOC12
 import qualified Y2017.AOC13
 import qualified Y2017.AOC14
 import qualified Y2017.AOC15
+import qualified Y2017.AOC16
 
 lookUpDay :: Day -> Solution
 lookUpDay D1 = Y2017.AOC1.solution
@@ -33,6 +34,7 @@ lookUpDay D12 = Y2017.AOC12.solution
 lookUpDay D13 = Y2017.AOC13.solution
 lookUpDay D14 = Y2017.AOC14.solution
 lookUpDay D15 = Y2017.AOC15.solution
+lookUpDay D16 = Y2017.AOC16.solution
 lookUpDay _ = error "nothing yet"
 
 year :: Year
