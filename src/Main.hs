@@ -15,6 +15,7 @@ import qualified Y2017.AOC as Y2017 (year)
 import qualified Y2019.AOC as Y2019 (year)
 import qualified Y2020.AOC as Y2020 (year)
 import qualified Y2021.AOC as Y2021 (year)
+import qualified Y2022.AOC as Y2022 (year)
 
 format :: IO String -> IO String -> IO ()
 format s1 s2 = do
@@ -32,7 +33,8 @@ main = do
         ("2017" : _) -> Y2017.year
         ("2019" : _) -> Y2019.year
         ("2020" : _) -> Y2020.year
-        _ -> Y2021.year
+        ("2021" : _) -> Y2021.year
+        _ -> Y2022.year
   let maybeDay = case arg of
         (_ : d : _) -> day d
         _ -> Nothing
