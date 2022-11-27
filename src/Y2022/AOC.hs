@@ -1,4 +1,4 @@
-module Y2017.AOC where
+module Y2022.AOC where
 
 import AOC (Day (..), Solution, Year (), mkYear')
 

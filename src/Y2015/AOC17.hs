@@ -2,6 +2,7 @@ module Y2015.AOC17 where
 
 import AOC (Solution (PureSolution))
 import Control.Applicative
+import Control.Monad (guard)
 import Control.Monad.Logic
 import Data.List (subsequences)
 import Util (Input, (|>))

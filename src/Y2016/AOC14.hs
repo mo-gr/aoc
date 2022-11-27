@@ -4,19 +4,16 @@ module Y2016.AOC14 (solution) where
 
 import AOC (Solution (PureSolution))
 import Control.Monad (guard)
-import Crypto.Hash (MD5, hash)
-import Data.ByteString.Char8 (pack)
+import Data.Digest.Pure.MD5 (md5)
+import Data.ByteString.Lazy.Char8 (pack)
 import Util (Input, times)
 
-md5 :: String -> String
-md5 input =
-  let hashSum :: MD5
-      hashSum = hash . pack $ input
-   in show hashSum
+md5HexString :: String -> String
+md5HexString = show . md5 . pack 
 
 keyData, stretchedKeyData :: String -> [String]
-keyData seed = snd <$> iterate (\(idx, _hashed) -> (succ idx, md5 (seed <> show (succ idx)))) (0 :: Int, md5 (seed <> "0"))
-stretchedKeyData seed = snd <$> iterate (\(idx, _hashed) -> (succ idx, times 2017 md5 (seed <> show (succ idx)))) (0 :: Int, times 2017 md5 (seed <> "0"))
+keyData seed = snd <$> iterate (\(idx, _hashed) -> (succ idx, md5HexString (seed <> show (succ idx)))) (0 :: Int, md5HexString (seed <> "0"))
+stretchedKeyData seed = snd <$> iterate (\(idx, _hashed) -> (succ idx, times 2017 md5HexString (seed <> show (succ idx)))) (0 :: Int, times 2017 md5HexString (seed <> "0"))
 
 hasTriplet :: String -> Maybe Char
 hasTriplet [] = Nothing

@@ -3,17 +3,14 @@
 module Y2016.AOC17 (solution) where
 
 import AOC (Solution (PureSolution))
-import Crypto.Hash (MD5, hash)
-import Data.ByteString.Char8 (pack)
+import Data.Digest.Pure.MD5 (md5)
+import Data.ByteString.Lazy.Char8 (pack)
 import Data.List (sort)
 import Data.Maybe (catMaybes)
 import Util (Input, (|>))
 
-md5 :: String -> String
-md5 inp =
-  let hashSum :: MD5
-      hashSum = hash . pack $ inp
-   in show hashSum
+md5HexString :: String -> String
+md5HexString = show . md5 . pack 
 
 data Coord = C1 | C2 | C3 | C4 deriving (Eq, Enum, Bounded)
 
@@ -46,7 +43,7 @@ isOpenDoor 'f' = True
 isOpenDoor _ = False
 
 openDoors :: Seed -> Path -> [Direction]
-openDoors s p = md5 (s <> reverse (mconcat (fmap show p))) |> take 4 |> zip [DUp, DDown, DLeft, DRight] |> filter (isOpenDoor . snd) |> fmap fst
+openDoors s p = md5HexString (s <> reverse (mconcat (fmap show p))) |> take 4 |> zip [DUp, DDown, DLeft, DRight] |> filter (isOpenDoor . snd) |> fmap fst
 
 safeSucc, safePred :: (Eq a, Bounded a, Enum a) => a -> Maybe a
 safeSucc a | a == maxBound = Nothing

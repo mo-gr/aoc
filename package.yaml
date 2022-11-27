@@ -9,15 +9,15 @@ dependencies:
 - bytestring
 - containers
 - directory
-- hashing
 - hedgehog
 - HUnit
 - json
 - logict
-- microlens-family
+- microlens-platform
 - mtl
 - parallel
 - parsec
+- pureMD5
 - safe
 executables:
   AOC:

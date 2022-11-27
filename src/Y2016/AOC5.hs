@@ -4,28 +4,25 @@ module Y2016.AOC5 where
 
 import AOC (Solution (PureSolution))
 import Control.Monad (guard)
-import Crypto.Hash (MD5, hash)
-import Data.ByteString.Char8 (pack)
+import Data.Digest.Pure.MD5 (md5)
+import Data.ByteString.Lazy.Char8 (pack)
 import Data.List (find, isPrefixOf)
 import Util (Input)
 
-md5 :: String -> String
-md5 inp =
-  let hashSum :: MD5
-      hashSum = hash . pack $ inp
-   in show hashSum
+md5HexString :: String -> String
+md5HexString = show . md5 . pack 
 
 hack :: String -> String
 hack seed = do
   idx <- ([0 ..] :: [Int])
-  let hashed = md5 (seed <> show idx)
+  let hashed = md5HexString (seed <> show idx)
   guard $ "00000" `isPrefixOf` hashed
   pure $ hashed !! 5
 
 hack2 :: String -> String
 hack2 seed = assemble $ do
   idx <- ([0 ..] :: [Int])
-  let hashed = md5 (seed <> show idx)
+  let hashed = md5HexString (seed <> show idx)
   guard $ "00000" `isPrefixOf` hashed
   pure (hashed !! 5, hashed !! 6)
 

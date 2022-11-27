@@ -1,19 +1,16 @@
 module Y2015.AOC4 where
 
 import AOC (Solution (PureSolution))
-import Crypto.Hash (MD5, hash)
-import Data.ByteString.Char8 (pack)
+import Data.Digest.Pure.MD5 (md5)
+import Data.ByteString.Lazy.Char8 (pack)
 import Data.List (isPrefixOf)
 import Util (Input)
 
-md5 :: String -> String
-md5 input =
-  let hashSum :: MD5
-      hashSum = hash . pack $ input
-   in show hashSum
+md5HexString :: String -> String
+md5HexString = show . md5 . pack 
 
 solve :: Int -> String -> String -> Int
-solve n prefix salt | prefix `isPrefixOf` md5 (salt <> show n) = n
+solve n prefix salt | prefix `isPrefixOf` md5HexString (salt <> show n) = n
 solve n prefix salt = solve (n + 1) prefix salt
 
 -- 254575
