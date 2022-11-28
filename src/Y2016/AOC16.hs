@@ -43,7 +43,7 @@ solution1 _input =
     |> showBits
 
 -- 01001101001000101
-solution2 :: _Input -> String
+solution2 :: Input -> String
 solution2 _input =
   fillData 35651584 seed
     |> showBits

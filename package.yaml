@@ -12,8 +12,9 @@ dependencies:
 - hedgehog
 - HUnit
 - json
+- lens
+- lens-aeson
 - logict
-- microlens-platform
 - mtl
 - parallel
 - parsec
