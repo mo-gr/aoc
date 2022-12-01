@@ -18,8 +18,7 @@ solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
     |> fmap sum
-    |> sort
-    |> last
+    |> maximum
 
 -- 201524
 solution2 :: Input -> Int
