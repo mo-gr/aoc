@@ -32,3 +32,5 @@ solution2 input =
 
 solution :: Solution
 solution = PureSolution solution1 69281 solution2 201524
+
+
