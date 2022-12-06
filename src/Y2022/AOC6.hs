@@ -11,26 +11,29 @@ import Util (Input, parseOrDie, (|>))
 inputParser :: Parser String
 inputParser = many1 letter
 
-startDistinctOffset :: Int -> Int -> String -> Int
-startDistinctOffset prefixLength idx stream
-  | length (S.fromList (take prefixLength stream)) == prefixLength = idx + prefixLength
-  | otherwise = startDistinctOffset prefixLength (succ idx) (tail stream)
+areFirstNDistinct :: Ord a => Int -> [a] -> Bool
+areFirstNDistinct n = (== n) . length . S.fromList . take n
 
-markerEnd, messageStart :: String -> Int
-markerEnd = startDistinctOffset 4 0
-messageStart = startDistinctOffset 14 0
+findDistinctOffset :: Int -> Int -> String -> Int
+findDistinctOffset prefixLength idx stream
+  | areFirstNDistinct prefixLength stream = idx + prefixLength
+  | otherwise = findDistinctOffset prefixLength (succ idx) (tail stream)
+
+markerPos, messagePos :: String -> Int
+markerPos = findDistinctOffset 4 0
+messagePos = findDistinctOffset 14 0
 
 -- 1343
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
-    |> markerEnd
+    |> markerPos
 
 -- 2193
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-    |> messageStart
+    |> messagePos
 
 solution :: Solution
 solution = PureSolution solution1 1343 solution2 2193
