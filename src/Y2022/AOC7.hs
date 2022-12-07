@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module Y2022.AOC7 where
 
 import AOC (Solution (PureSolution))
 import Control.Applicative ((<|>))
-import Control.Lens (view, _2)
+import Control.Lens (folded, makeLenses, sumOf, view)
 import Data.Either (isLeft, lefts)
 import Data.Functor (($>))
 import Data.List (sortOn)
@@ -13,23 +14,35 @@ import Text.Parsec (char, letter, many1, newline, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, (|>))
 
+type Size = Int
+
 data Cmd = Cd String | Ls
   deriving (Show, Eq)
-
-type Size = Int
 
 data Listing = Directory String | File String Size
   deriving (Show, Eq, Ord)
 
-data FileNode = FileNode String Size
+data FileNode = FileNode
+  { _fileName :: String,
+    _fileSize :: Size
+  }
   deriving (Show, Eq, Ord)
 
-type FileSystem = Tree (String, [FileNode])
+makeLenses ''FileNode
 
-type FileSystemWithSize = Tree (String, Int, [FileNode])
+data DirectoryNode = DirectoryNode
+  { _directoryName :: String,
+    _directorySize :: Size,
+    _directoryFiles :: [FileNode]
+  }
+  deriving (Show, Eq, Ord)
+
+makeLenses ''DirectoryNode
+
+type FileSystem = Tree DirectoryNode
 
 mkFs :: [Either Listing Cmd] -> FileSystem
-mkFs commands = unfoldTree buildTree "/"
+mkFs commands = annotateSize $ unfoldTree buildTree "/"
   where
     buildTree :: String -> ((String, [FileNode]), [String])
     buildTree n = walkTil commands "/" n |> foldl (f n) ([], []) |> \(t, d) -> ((n, t), d)
@@ -37,6 +50,12 @@ mkFs commands = unfoldTree buildTree "/"
     f "/" (fs, ds) (Directory dn) = (fs, "/" <> dn : ds)
     f prev (fs, ds) (Directory dn) = (fs, prev <> "/" <> dn : ds)
     f _prev (fs, ds) (File fn fz) = (FileNode fn fz : fs, ds)
+
+annotateSize :: Tree (String, [FileNode]) -> Tree DirectoryNode
+annotateSize root@(Node (name, files) dirs) = Node (DirectoryNode name (calcDirSize root) files) (annotateSize <$> dirs)
+  where
+    calcDirSize :: Tree (String, [FileNode]) -> Size
+    calcDirSize (Node (_name, dirFiles) subDirs) = sumOf (folded . fileSize) dirFiles + sum (calcDirSize <$> subDirs)
 
 walkTil :: [Either Listing Cmd] -> String -> String -> [Listing]
 walkTil ((Right (Cd "..")) : rest) dirStack target = walkTil rest (dropLastDir dirStack) target
@@ -65,53 +84,36 @@ inputParser = many1 (Right <$> commandP <|> Left <$> listingP)
     cdP = Cd <$> (string "$ cd " *> many1 (char '/' <|> char '.' <|> letter))
     lsP = string "$ ls" $> Ls
 
-fileSize :: FileNode -> Size
-fileSize (FileNode _ sz) = sz
-
-dirSize :: Tree (String, [FileNode]) -> Size
-dirSize (Node (_name, files) []) = sum (fileSize <$> files)
-dirSize (Node (name, files) (c : rest)) = dirSize c + dirSize (Node (name, files) rest)
-
-annotateSize :: FileSystem -> FileSystemWithSize
-annotateSize (Node (name, files) subDirs) = Node (name, nodeSize, files) (annotateSize <$> subDirs)
-  where
-    nodeSize =
-      sum (fileSize <$> files)
-        + sum (dirSize <$> subDirs)
-
 -- 1667443
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
     |> mkFs
-    |> annotateSize
     |> flatten
-    |> filter ((>) 100000 . view _2)
-    |> fmap (view _2)
+    |> filter ((>) 100000 . view directorySize)
+    |> fmap (view directorySize)
     |> sum
-
 
 totalDiskSpace, requiredSpace :: Size
 requiredSpace = 30000000
 totalDiskSpace = 70000000
 
-freeSpace :: FileSystemWithSize -> Size
-freeSpace fsz = flatten fsz |> head |> view _2 |> \usedSpace -> totalDiskSpace - usedSpace
+freeSpace :: FileSystem -> Size
+freeSpace fsz = flatten fsz |> head |> view directorySize |> \usedSpace -> totalDiskSpace - usedSpace
 
-missingSpace :: FileSystemWithSize -> Size
+missingSpace :: FileSystem -> Size
 missingSpace fsz = requiredSpace - freeSpace fsz
 
-directoryToDelete :: FileSystemWithSize -> (String, Int, [FileNode])
-directoryToDelete fsz = head . dropWhile ((< missingSpace fsz) . view _2) . sortOn (view _2) . flatten $ fsz
+directoryToDelete :: FileSystem -> DirectoryNode
+directoryToDelete fsz = head . dropWhile ((< missingSpace fsz) . view directorySize) . sortOn (view directorySize) . flatten $ fsz
 
 -- 8998590
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
     |> mkFs
-    |> annotateSize
     |> directoryToDelete
-    |> view _2
+    |> view directorySize
 
 solution :: Solution
 solution = PureSolution solution1 1667443 solution2 8998590
