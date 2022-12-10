@@ -9,6 +9,7 @@ import qualified Y2022.AOC5
 import qualified Y2022.AOC6
 import qualified Y2022.AOC7
 import qualified Y2022.AOC8
+import qualified Y2022.AOC9
 
 lookUpDay :: Day -> Solution
 lookUpDay D1 = Y2022.AOC1.solution
@@ -19,6 +20,7 @@ lookUpDay D5 = Y2022.AOC5.solution
 lookUpDay D6 = Y2022.AOC6.solution
 lookUpDay D7 = Y2022.AOC7.solution
 lookUpDay D8 = Y2022.AOC8.solution
+lookUpDay D9 = Y2022.AOC9.solution
 lookUpDay _ = error "not started yet"
 
 year :: Year
