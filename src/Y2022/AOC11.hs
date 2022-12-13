@@ -6,7 +6,7 @@ module Y2022.AOC11 where
 import AOC (Solution (PureSolution))
 import Text.Parsec.ByteString (Parser)
 import Util (Input, parseOrDie, (|>), number, times)
-import Control.Lens (makeLenses, view, over, set, toListOf, traversed, _2, lengthOf, each)
+import Control.Lens (makeLenses, view, over, set, traversed, _2, lengthOf, each)
 import Text.Parsec (string, char, newline, sepBy, try, many1, digit)
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
@@ -14,7 +14,7 @@ import qualified Data.Map.Strict as M
 import Debug.Trace (traceShowId)
 import Data.List (sort)
 
-bigNumber :: Parser Integer
+bigNumber :: Parser Int
 bigNumber = read <$> many1 digit
 
 inputParser :: Parser (M.Map MonkeyId Monkey)
@@ -25,15 +25,16 @@ inputParser = fmap M.fromList $ flip sepBy newline $ do
   d <- string "  Test: divisible by " *> bigNumber <* newline
   true <- string "    If true: throw to monkey " *> number <* newline
   false <- string "    If false: throw to monkey " *> number <* newline
-  pure (mid, Monkey is op (\a -> if a `rem` d == 0 then true else false) 0)
-  where opP = (string "+ " *> bigNumber >>= \n -> pure (+ n))
-              <|> try (string "* " *> bigNumber >>= \n -> pure (* n))
-              <|> (string "* old" $> (\n -> n*n))
+  pure (mid, Monkey (fmap (M.singleton 0) is) d op (\a -> if (a M.! d) `rem` d == 0 then true else false) 0)
+  where opP = (string "+ " *> bigNumber >>= \n -> pure (M.mapWithKey (\k v -> n + v `mod` k)))
+              <|> try (string "* " *> bigNumber >>= \n -> pure (M.mapWithKey (\k v -> n * v `mod` k)))
+              <|> (string "* old" $> M.mapWithKey (\k v -> v * v `mod` k))
 
-type Item = Integer
+type Item = M.Map Int Int
 type MonkeyId = Int
 data Monkey = Monkey {
   _items :: [Item],
+  _divisor :: Int,
   _op :: Item -> Item,
   _throw :: Item -> MonkeyId,
   _inspectCount :: Int
@@ -47,7 +48,7 @@ turn1 :: Monkey -> (Monkey, [(MonkeyId, Item)])
 turn1 m = (m', view items m |> fmap process)
   where process :: Item -> (MonkeyId, Item)
         process i = view op m i
-                  |> (`quot` 3)
+                  |> M.mapWithKey (\k v -> (v `quot` 3) `mod` k )
                   |> \i' -> (view throw m i', i')
         m' = m |> set items [] 
                |> over inspectCount (+ lengthOf (items.each) m)
@@ -59,10 +60,18 @@ monkeyRound turn ms = foldl processTurn ms (M.toAscList ms)
         ins :: M.Map MonkeyId Monkey -> (MonkeyId, Item) -> M.Map MonkeyId Monkey
         ins mp (k, i) = M.adjust (over items (\is -> is <> [i])) k mp
 
+prepopulateDivisorMap :: M.Map MonkeyId Monkey -> M.Map MonkeyId Monkey
+prepopulateDivisorMap mmap = M.map (over (items.traversed) (\i -> populatedItem (i M.! 0))) mmap
+  where ms = M.elems mmap
+        divisors = filter (/= 0) $ view divisor <$> ms 
+        populatedItem :: Int -> Item
+        populatedItem i = M.fromList $ zip divisors (repeat i) 
+
 -- 54036
 solution1 :: Input -> Int
 solution1 input =
   parseOrDie inputParser input
+    |> prepopulateDivisorMap
     |> times 20 (monkeyRound turn1)
     |> monkeyBusiness
 
@@ -77,15 +86,16 @@ turn2 m = (m', view items m |> fmap process )
         m' = m |> set items [] 
                |> over inspectCount (+ lengthOf (items.each) m)
 
--- too high 13910426396
+-- 13237873355
 solution2 :: Input -> Int
 solution2 input =
   parseOrDie inputParser input
-    |> times 1000 (monkeyRound turn2)
+    |> prepopulateDivisorMap
+    |> times 10000 (monkeyRound turn2)
     |> monkeyBusiness
 
 solution :: Solution
-solution = PureSolution solution1 54036 solution2 undefined
+solution = PureSolution solution1 54036 solution2 13237873355
 
 testData :: Input
 testData = "Monkey 0:\n\
