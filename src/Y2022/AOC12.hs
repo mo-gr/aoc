@@ -80,11 +80,3 @@ solution2 input =
 
 solution :: Solution
 solution = PureSolution solution1 339 solution2 332
-
-testData :: Input
-testData =
-  "Sabqponm\n\
-  \abcryxxl\n\
-  \accszExk\n\
-  \acctuvwj\n\
-  \abdefghi\n"
