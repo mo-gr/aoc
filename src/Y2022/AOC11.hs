@@ -9,7 +9,6 @@ import Control.Lens (each, lengthOf, makeLenses, over, set, traversed, view, _2)
 import Data.Functor (($>))
 import Data.List (sort)
 import qualified Data.Map.Strict as M
-import Debug.Trace (traceShowId)
 import Text.Parsec (char, newline, sepBy, string, try)
 import Text.Parsec.ByteString (Parser)
 import Util (Input, number, parseOrDie, times, (|>))
@@ -97,7 +96,7 @@ solution1 input =
     |> monkeyBusiness
 
 monkeyBusiness :: M.Map MonkeyId (Monkey a) -> Int
-monkeyBusiness m = M.toList m |> fmap (view (_2 . inspectCount)) |> traceShowId |> sort |> reverse |> take 2 |> product
+monkeyBusiness m = M.toList m |> fmap (view (_2 . inspectCount)) |> sort |> reverse |> take 2 |> product
 
 turn2 :: Monkey ComplexItem -> (Monkey ComplexItem, [(MonkeyId, ComplexItem)])
 turn2 m = (m', view items m |> fmap process)
